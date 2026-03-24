@@ -82,6 +82,24 @@ jobs:
           cd live-build
           chmod +x auto/*
 
+          # Create local bootloader config with real files (not symlinks)
+          # lb_binary_syslinux uses config/bootloaders/isolinux/ if it exists,
+          # bypassing the system template which has broken symlinks in chroot context
+          mkdir -p config/bootloaders/isolinux
+          # Copy system template config files first
+          cp /usr/share/live/build/bootloaders/isolinux/*.cfg config/bootloaders/isolinux/ 2>/dev/null || true
+          cp /usr/share/live/build/bootloaders/isolinux/*.cfg.in config/bootloaders/isolinux/ 2>/dev/null || true
+          cp /usr/share/live/build/bootloaders/isolinux/*.txt config/bootloaders/isolinux/ 2>/dev/null || true
+          cp /usr/share/live/build/bootloaders/isolinux/*.svg config/bootloaders/isolinux/ 2>/dev/null || true
+          # Add actual binary files (not symlinks)
+          cp /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/
+          cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/
+          cp /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/
+          cp /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/
+          cp /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/
+          echo "=== local bootloader template ==="
+          ls -la config/bootloaders/isolinux/
+
           sudo lb config
           sudo lb build 2>&1 || true
 

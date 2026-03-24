@@ -23,8 +23,8 @@ lb config noauto \
     --cache true \
     --cache-packages true \
     --apt-source-archives false \
-    --firmware-binary true \
-    --firmware-chroot true \
+    --firmware-binary false \
+    --firmware-chroot false \
     --volatile true \
     --security true \
     --initramfs auto \

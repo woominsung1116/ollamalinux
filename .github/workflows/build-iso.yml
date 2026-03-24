@@ -82,20 +82,20 @@ jobs:
           cd live-build
           chmod +x auto/*
 
-          # Fix isolinux paths for live-build 4.x on Ubuntu 24.04
-          # live-build looks for files at /root/isolinux/ when running as root
+          # Fix isolinux: lb_binary_syslinux looks inside chroot/root/isolinux/
+          # Copy isolinux files into chroot overlay so they exist during lb build
+          mkdir -p config/includes.chroot/root/isolinux
+          cp /usr/lib/ISOLINUX/isolinux.bin config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          cp /usr/lib/syslinux/modules/bios/ldlinux.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          cp /usr/lib/syslinux/modules/bios/libcom32.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          cp /usr/lib/syslinux/modules/bios/libutil.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          cp /usr/lib/syslinux/modules/bios/menu.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
+          # Also copy to host /root/ as fallback
           sudo mkdir -p /root/isolinux
-          echo "=== Finding isolinux files ==="
-          sudo find /usr -name "isolinux.bin" -o -name "vesamenu.c32" -o -name "ldlinux.c32" -o -name "libcom32.c32" -o -name "libutil.c32" 2>/dev/null
-          for f in isolinux.bin vesamenu.c32 ldlinux.c32 libcom32.c32 libutil.c32 hdt.c32 libmenu.c32 libgpl.c32 menu.c32; do
-            src=$(find /usr -name "$f" 2>/dev/null | head -1)
-            if [ -n "$src" ]; then
-              sudo cp "$src" /root/isolinux/
-              echo "  Copied: $src -> /root/isolinux/$f"
-            fi
-          done
-          echo "=== /root/isolinux/ contents ==="
-          ls -la /root/isolinux/ 2>/dev/null || echo "  (empty or not found)"
+          sudo cp config/includes.chroot/root/isolinux/* /root/isolinux/ 2>/dev/null || true
+          echo "=== isolinux files prepared ==="
+          ls -la config/includes.chroot/root/isolinux/
 
           sudo lb config
           sudo lb build 2>&1 || true

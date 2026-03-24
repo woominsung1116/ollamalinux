@@ -4,9 +4,10 @@ set -euo pipefail
 PROJECT="${PROJECT:-ollamalinux}"
 VERSION="${VERSION:-0.1.0}"
 FLAVOR="${FLAVOR:-server}"
+ARCH="${ARCH:-amd64}"
 
 echo "============================================"
-echo " Building ${PROJECT} v${VERSION} (${FLAVOR})"
+echo " Building ${PROJECT} v${VERSION} (${FLAVOR}) [${ARCH}]"
 echo "============================================"
 
 cd /build/live-build
@@ -59,7 +60,7 @@ lb config noauto \
     --mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
     --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
     --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
-    --architectures amd64 \
+    --architectures "${ARCH}" \
     --binary-images iso \
     --mode debian \
     --system live \
@@ -86,7 +87,7 @@ lb config noauto \
 lb build noauto 2>&1 | tee /build/output/build.log
 
 # Move output
-mv *.iso /build/output/${PROJECT}-${VERSION}-${FLAVOR}-amd64.iso 2>/dev/null || true
+mv *.iso /build/output/${PROJECT}-${VERSION}-${FLAVOR}-${ARCH}.iso 2>/dev/null || true
 mv *.zsync /build/output/ 2>/dev/null || true
 mv *.contents /build/output/ 2>/dev/null || true
 mv *.packages /build/output/ 2>/dev/null || true
@@ -98,6 +99,6 @@ if [ -d cache/packages.chroot ]; then
 fi
 
 echo "============================================"
-echo " Build complete: ${PROJECT}-${VERSION}-${FLAVOR}-amd64.iso"
+echo " Build complete: ${PROJECT}-${VERSION}-${FLAVOR}-${ARCH}.iso"
 echo "============================================"
 ls -lh /build/output/*.iso 2>/dev/null

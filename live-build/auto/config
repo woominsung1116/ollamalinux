@@ -5,6 +5,9 @@ set -e
 # --apt-recommends false prevents unwanted theme/meta dependencies.
 # Security/volatile/backports disabled since noble-updates covers security.
 
+# Architecture can be overridden via ARCH env variable (e.g. ARCH=arm64)
+ARCH="${ARCH:-amd64}"
+
 lb config noauto \
     --distribution noble \
     --parent-distribution noble \
@@ -16,7 +19,7 @@ lb config noauto \
     --mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
     --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
     --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
-    --architectures amd64 \
+    --architectures "${ARCH}" \
     --binary-images iso \
     --mode debian \
     --system live \

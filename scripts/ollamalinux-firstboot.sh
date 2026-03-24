@@ -21,37 +21,50 @@ welcome_screen() {
 
 configure_hostname() {
     local hostname
-    hostname=$(whiptail --title "Hostname" \
-        --inputbox "Enter a hostname for this machine:" \
-        8 60 "ollamalinux" 3>&1 1>&2 2>&3) || return 0
+    while true; do
+        hostname=$(whiptail --title "Hostname" \
+            --inputbox "Enter a hostname for this machine:" \
+            8 60 "ollamalinux" 3>&1 1>&2 2>&3) || return 0
 
-    # Validate RFC-1123 hostname
-    if ! echo "$hostname" | grep -qE '^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'; then
+        # Validate RFC-1123 hostname
+        if echo "$hostname" | grep -qE '^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'; then
+            hostnamectl set-hostname "$hostname"
+            log "Hostname set to: $hostname"
+            return 0
+        fi
+
         whiptail --msgbox "Invalid hostname. Use only letters, digits, and hyphens (1-63 chars)." 8 60
-        return 1
-    fi
-    hostnamectl set-hostname "$hostname"
-    log "Hostname set to: $hostname"
+    done
 }
 
 create_user() {
     local password
-    username=$(whiptail --title "User Account" \
-        --inputbox "Create an admin user account.\n\nUsername:" \
-        10 60 "ai" 3>&1 1>&2 2>&3) || return 0
+    while true; do
+        username=$(whiptail --title "User Account" \
+            --inputbox "Create an admin user account.\n\nUsername:" \
+            10 60 "ai" 3>&1 1>&2 2>&3) || return 0
 
-    password=$(whiptail --title "User Account" \
-        --passwordbox "Password for $username:" \
-        8 60 3>&1 1>&2 2>&3) || return 0
+        # Simple username validation
+        if ! echo "$username" | grep -qE '^[a-z_][a-z0-9_-]*$'; then
+             whiptail --msgbox "Invalid username. Use only lowercase letters, digits, underscores, and hyphens." 8 60
+             continue
+        fi
 
-    if [ ${#password} -lt 8 ]; then
-        whiptail --msgbox "Password must be at least 8 characters." 8 60
-        return 1
-    fi
-    useradd -m -s /bin/bash -G sudo,ollama "$username" 2>/dev/null || true
-    printf '%s:%s\n' "$username" "$password" | chpasswd
-    unset password
-    log "User created: $username"
+        password=$(whiptail --title "User Account" \
+            --passwordbox "Password for $username:" \
+            8 60 3>&1 1>&2 2>&3) || return 0
+
+        if [ ${#password} -lt 8 ]; then
+            whiptail --msgbox "Password must be at least 8 characters." 8 60
+            continue
+        fi
+
+        useradd -m -s /bin/bash -G sudo,ollama "$username" 2>/dev/null || true
+        printf '%s:%s\n' "$username" "$password" | chpasswd
+        unset password
+        log "User created: $username"
+        return 0
+    done
 }
 
 detect_gpu() {

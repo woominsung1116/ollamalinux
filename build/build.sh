@@ -61,6 +61,7 @@ lb config noauto \
     --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
     --architectures amd64 \
     --binary-images iso-hybrid \
+    --mode debian \
     --system live \
     --linux-flavours generic \
     --linux-packages "linux-image linux-headers" \
@@ -70,6 +71,7 @@ lb config noauto \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux-${VERSION}" \
+    --bootloader grub2 \
     --security false \
     --volatile false \
     --backports false \

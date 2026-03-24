@@ -84,6 +84,14 @@ jobs:
           cd live-build
           chmod +x auto/*
 
+          # Patch genisoimage 4GB limit: only patch the actual command invocation line
+          # (squashfs exceeds 4GB due to Ollama+CUDA packages)
+          LB_ISO="/usr/lib/live/build/lb_binary_iso"
+          if [ -f "$LB_ISO" ]; then
+            sudo sed -i '/^\s*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
+            sudo sed -i '/Chroot.*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
+          fi
+
           sudo lb config
           sudo lb build 2>&1 | tee build.log
 
@@ -170,6 +178,13 @@ jobs:
         run: |
           cd live-build
           chmod +x auto/*
+
+          # Patch genisoimage 4GB limit (same as server build)
+          LB_ISO="/usr/lib/live/build/lb_binary_iso"
+          if [ -f "$LB_ISO" ]; then
+            sudo sed -i '/^\s*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
+            sudo sed -i '/Chroot.*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
+          fi
 
           sudo lb config
           sudo lb build 2>&1 | tee build.log

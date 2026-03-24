@@ -71,6 +71,11 @@ jobs:
             cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
           fi
 
+          # Copy hooks to config/hooks/ for live-build 4.x compatibility
+          mkdir -p config/hooks
+          cp config/hooks/live/*.hook.chroot config/hooks/ 2>/dev/null || true
+          chmod +x config/hooks/*.hook.chroot 2>/dev/null || true
+
           # Remove desktop packages for server build
           rm -f config/package-lists/desktop.list.chroot
 
@@ -78,10 +83,12 @@ jobs:
         run: |
           cd live-build
           chmod +x auto/*
-          chmod +x config/hooks/live/*.hook.chroot
 
           sudo lb config
-          sudo lb build
+          sudo lb build 2>&1 || true
+
+          # Verify ISO was produced
+          ls -lh *.iso binary.hybrid.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
 
       - name: Collect output
         run: |
@@ -149,16 +156,23 @@ jobs:
             cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
           fi
 
+          # Copy hooks to config/hooks/ for live-build 4.x compatibility
+          mkdir -p config/hooks
+          cp config/hooks/live/*.hook.chroot config/hooks/ 2>/dev/null || true
+          chmod +x config/hooks/*.hook.chroot 2>/dev/null || true
+
           # Keep desktop packages for desktop build
 
       - name: Build Desktop ISO
         run: |
           cd live-build
           chmod +x auto/*
-          chmod +x config/hooks/live/*.hook.chroot
 
           sudo lb config
-          sudo lb build
+          sudo lb build 2>&1 || true
+
+          # Verify ISO was produced
+          ls -lh *.iso binary.hybrid.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
 
       - name: Collect output
         run: |

@@ -67,7 +67,7 @@ lb config noauto \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux ${VERSION}" \
-    --bootloader grub \
+    --bootloader syslinux \
     --cache true \
     --cache-packages true \
     --apt-source-archives false \

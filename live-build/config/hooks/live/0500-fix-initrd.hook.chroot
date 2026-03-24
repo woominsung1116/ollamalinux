@@ -1,17 +1,32 @@
 #!/bin/bash
 set -euo pipefail
 
-echo ">>> Fixing initrd symlinks and regenerating initramfs..."
+echo ">>> Ensuring initramfs is properly generated..."
 
-# Remove dangling symlinks that cause lb_chroot_hacks to fail
-for link in /boot/initrd.img /boot/initrd.img.old /boot/vmlinuz /boot/vmlinuz.old; do
-    if [ -L "$link" ] && [ ! -e "$link" ]; then
-        rm -f "$link"
-        echo "  Removed dangling symlink: $link"
+# Find installed kernel version
+KVER=$(ls /lib/modules/ 2>/dev/null | sort -V | tail -1)
+
+if [ -n "$KVER" ]; then
+    echo "  Kernel version: $KVER"
+
+    # Regenerate initramfs for the installed kernel
+    update-initramfs -c -k "$KVER" 2>/dev/null || update-initramfs -u -k "$KVER" 2>/dev/null || true
+
+    # Fix dangling symlinks to point to actual files
+    if [ -f "/boot/vmlinuz-$KVER" ]; then
+        ln -sf "vmlinuz-$KVER" /boot/vmlinuz 2>/dev/null || true
     fi
-done
+    if [ -f "/boot/initrd.img-$KVER" ]; then
+        ln -sf "initrd.img-$KVER" /boot/initrd.img 2>/dev/null || true
+    fi
 
-# Regenerate initramfs to ensure proper boot files
-update-initramfs -u 2>/dev/null || true
+    # Remove .old symlinks that are always dangling in live builds
+    rm -f /boot/vmlinuz.old /boot/initrd.img.old 2>/dev/null || true
 
-echo ">>> Initrd fix complete."
+    echo "  initrd files:"
+    ls -la /boot/initrd.img* /boot/vmlinuz* 2>/dev/null || echo "  (none found)"
+else
+    echo "  WARNING: No kernel found in /lib/modules/"
+fi
+
+echo ">>> Initramfs fix complete."

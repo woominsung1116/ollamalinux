@@ -48,17 +48,17 @@ if [ -d /build/cache/packages ]; then
 fi
 
 # Run live-build
-# auto/config is invoked by lb config, auto/build by lb build
 lb config noauto \
     --distribution noble \
     --parent-distribution noble \
     --parent-archive-areas "main restricted universe multiverse" \
     --archive-areas "main restricted universe multiverse" \
+    --parent-mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-binary "http://archive.ubuntu.com/ubuntu/" \
     --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
     --mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
     --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
-    --mirror-chroot-security "http://security.ubuntu.com/ubuntu/" \
-    --mirror-binary-security "http://security.ubuntu.com/ubuntu/" \
     --architectures amd64 \
     --binary-images iso-hybrid \
     --mode debian \
@@ -72,6 +72,9 @@ lb config noauto \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux-${VERSION}" \
     --bootloader syslinux \
+    --security false \
+    --volatile false \
+    --backports false \
     --cache true \
     --cache-packages true \
     --apt-source-archives false \

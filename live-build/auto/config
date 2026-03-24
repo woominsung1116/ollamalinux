@@ -1,16 +1,22 @@
 #!/bin/bash
 set -e
 
+# Use --mode debian to avoid broken Ubuntu-specific theme dependencies.
+# Disable security/volatile/backports to prevent Debian-style repo paths
+# (noble/updates) that don't exist on Ubuntu mirrors.
+# Security updates are already included in noble-updates via the main mirror.
+
 lb config noauto \
     --distribution noble \
     --parent-distribution noble \
     --parent-archive-areas "main restricted universe multiverse" \
     --archive-areas "main restricted universe multiverse" \
+    --parent-mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-binary "http://archive.ubuntu.com/ubuntu/" \
     --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
     --mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
     --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
-    --mirror-chroot-security "http://security.ubuntu.com/ubuntu/" \
-    --mirror-binary-security "http://security.ubuntu.com/ubuntu/" \
     --architectures amd64 \
     --binary-images iso-hybrid \
     --mode debian \
@@ -24,6 +30,9 @@ lb config noauto \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux-0.1.0" \
     --bootloader syslinux \
+    --security false \
+    --volatile false \
+    --backports false \
     --cache true \
     --cache-packages true \
     --apt-source-archives false \

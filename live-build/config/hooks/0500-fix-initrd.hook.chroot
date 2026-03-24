@@ -10,7 +10,13 @@ if [ -n "$KVER" ]; then
     echo "  Kernel version: $KVER"
 
     # Regenerate initramfs for the installed kernel
-    update-initramfs -c -k "$KVER" 2>/dev/null || update-initramfs -u -k "$KVER" 2>/dev/null || true
+    if ! update-initramfs -c -k "$KVER" 2>/dev/null; then
+        echo "  WARNING: initramfs create failed, trying update..."
+        if ! update-initramfs -u -k "$KVER" 2>/dev/null; then
+            echo "  ERROR: initramfs generation failed for $KVER"
+            echo "  Boot may not work without a valid initramfs!"
+        fi
+    fi
 
     # Fix dangling symlinks to point to actual files
     if [ -f "/boot/vmlinuz-$KVER" ]; then

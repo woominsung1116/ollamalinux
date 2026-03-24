@@ -26,17 +26,17 @@ install_nvidia_drivers() {
     log "Installing NVIDIA drivers and CUDA toolkit..."
     apt-get update -qq
     apt-get install -y nvidia-driver-560 nvidia-utils-560 cuda-toolkit-12-6
+    # nvidia-smi may not work until reboot (kernel module not loaded yet)
+    echo "GPU_TYPE=nvidia" > "$GPU_CONF"
+    echo "GPU_DRIVER=560" >> "$GPU_CONF"
+    echo "CUDA_VERSION=12.6" >> "$GPU_CONF"
     if nvidia-smi &>/dev/null; then
         local gpu_info
-        gpu_info=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader)
-        log "NVIDIA driver installed: $gpu_info"
-        echo "GPU_TYPE=nvidia" > "$GPU_CONF"
-        echo "GPU_DRIVER=560" >> "$GPU_CONF"
+        gpu_info=$(nvidia-smi --query-gpu=name,memory.total --format=csv,noheader 2>/dev/null || echo "unknown")
         echo "GPU_INFO=\"$gpu_info\"" >> "$GPU_CONF"
-        echo "CUDA_VERSION=12.6" >> "$GPU_CONF"
+        log "NVIDIA driver installed: $gpu_info"
     else
-        log "ERROR: NVIDIA driver installation failed"
-        return 1
+        log "NVIDIA drivers installed (nvidia-smi will work after reboot)"
     fi
 }
 
@@ -64,17 +64,14 @@ main() {
 
     local gpu_found=false
 
+    # Priority: NVIDIA > AMD > Intel (install only the primary GPU driver)
     if detect_nvidia; then
         gpu_found=true
         install_nvidia_drivers
-    fi
-
-    if detect_amd; then
+    elif detect_amd; then
         gpu_found=true
         install_amd_drivers
-    fi
-
-    if detect_intel; then
+    elif detect_intel; then
         gpu_found=true
         install_intel_drivers
     fi

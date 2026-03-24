@@ -10,7 +10,7 @@ useradd -r -s /bin/false -U -m -d "$WEBUI_DIR" "$WEBUI_USER" 2>/dev/null || true
 
 python3 -m venv "$WEBUI_DIR/venv"
 source "$WEBUI_DIR/venv/bin/activate"
-pip install --no-cache-dir open-webui
+pip install --no-cache-dir --retries 5 --timeout 60 open-webui
 deactivate
 
 mkdir -p "$WEBUI_DIR/data"

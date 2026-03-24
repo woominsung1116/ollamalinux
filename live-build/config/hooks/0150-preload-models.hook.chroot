@@ -5,8 +5,8 @@ echo ">>> Preload models hook starting..."
 
 # PRELOAD_MODELS: comma-separated list of models to pull during build
 # e.g. PRELOAD_MODELS="llama3.2:1b,phi3:mini,nomic-embed-text"
-# Default: llama3.2:1b,phi3:mini,nomic-embed-text (OllamaLinux v3 standard)
-PRELOAD_MODELS="${PRELOAD_MODELS:-llama3.2:1b,phi3:mini,nomic-embed-text}" \,old_string:
+# Default: empty (no preload, to keep ISO size small)
+PRELOAD_MODELS="${PRELOAD_MODELS:-}"
 
 if [ -z "$PRELOAD_MODELS" ]; then
     echo ">>> PRELOAD_MODELS is empty, skipping model preload."

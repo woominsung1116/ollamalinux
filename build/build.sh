@@ -71,7 +71,7 @@ lb config noauto \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux-${VERSION}" \
-    --bootloader syslinux \
+    --bootloader grub2 \
     --security false \
     --volatile false \
     --backports false \

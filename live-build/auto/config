@@ -6,27 +6,27 @@ lb config noauto \
     --parent-distribution noble \
     --parent-archive-areas "main restricted universe multiverse" \
     --archive-areas "main restricted universe multiverse" \
+    --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
+    --mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
+    --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
     --architectures amd64 \
     --binary-images iso-hybrid \
-    --mode ubuntu \
+    --mode debian \
     --system live \
     --linux-flavours generic \
     --linux-packages "linux-image linux-headers" \
     --apt-recommends false \
     --memtest none \
     --bootappend-live "boot=live components quiet splash" \
-    --bootappend-install "auto=true priority=critical" \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
-    --iso-volume "OllamaLinux 0.1.0" \
+    --iso-volume "OllamaLinux-0.1.0" \
     --bootloader syslinux \
     --cache true \
     --cache-packages true \
     --apt-source-archives false \
     --firmware-binary false \
     --firmware-chroot false \
-    --volatile true \
-    --security true \
     --initramfs auto \
     --initsystem systemd \
     "${@}"

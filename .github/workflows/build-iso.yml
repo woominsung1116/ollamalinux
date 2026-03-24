@@ -71,9 +71,7 @@ jobs:
             cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
           fi
 
-          # Copy hooks to config/hooks/ for live-build 4.x compatibility
-          mkdir -p config/hooks
-          cp config/hooks/live/*.hook.chroot config/hooks/ 2>/dev/null || true
+          # Ensure hooks are executable (already in config/hooks/ for live-build 4.x)
           chmod +x config/hooks/*.hook.chroot 2>/dev/null || true
 
           # Remove desktop packages for server build
@@ -156,9 +154,7 @@ jobs:
             cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
           fi
 
-          # Copy hooks to config/hooks/ for live-build 4.x compatibility
-          mkdir -p config/hooks
-          cp config/hooks/live/*.hook.chroot config/hooks/ 2>/dev/null || true
+          # Ensure hooks are executable (already in config/hooks/ for live-build 4.x)
           chmod +x config/hooks/*.hook.chroot 2>/dev/null || true
 
           # Keep desktop packages for desktop build

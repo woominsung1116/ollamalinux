@@ -1,3 +1,6 @@
+live-boot
+live-config
+live-config-systemd
 systemd
 systemd-sysv
 dbus
@@ -40,3 +43,6 @@ whiptail
 dialog
 zstd
 pigz
+grub-pc
+grub-efi-amd64
+grub-common

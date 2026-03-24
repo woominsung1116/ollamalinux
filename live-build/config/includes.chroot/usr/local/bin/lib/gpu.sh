@@ -5,7 +5,7 @@ GPU_CONF="/etc/ollamalinux/gpu.conf"
 
 # Ensure common library is loaded for get_conf_value
 if ! command -v get_conf_value &>/dev/null; then
-    source /usr/local/bin/lib/common.sh 2>/dev/null || true
+    source /usr/local/bin/lib/common.sh 2>/dev/null || source "$(dirname "$0")/common.sh" 2>/dev/null || true
 fi
 
 get_gpu_type() {

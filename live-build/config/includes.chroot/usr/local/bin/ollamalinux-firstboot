@@ -37,8 +37,13 @@ create_user() {
         --passwordbox "Password for $username:" \
         8 60 3>&1 1>&2 2>&3) || return 0
 
+    if [ ${#password} -lt 8 ]; then
+        whiptail --msgbox "Password must be at least 8 characters." 8 60
+        return 1
+    fi
     useradd -m -s /bin/bash -G sudo,ollama "$username" 2>/dev/null || true
-    echo "$username:$password" | chpasswd
+    printf '%s:%s\n' "$username" "$password" | chpasswd
+    unset password
     log "User created: $username"
 }
 
@@ -50,9 +55,7 @@ detect_gpu() {
     ollamalinux-gpu-detect detect 2>/dev/null || true
 
     local gpu_type="cpu"
-    if [ -f "$CONF_DIR/gpu.conf" ]; then
-        gpu_type=$(grep '^GPU_TYPE=' "$CONF_DIR/gpu.conf" | cut -d= -f2 | tr -d '"')
-    fi
+    [ -f "$CONF_DIR/gpu.conf" ] && gpu_type=$(grep '^GPU_TYPE=' "$CONF_DIR/gpu.conf" 2>/dev/null | cut -d= -f2 || echo "cpu")
 
     local msg
     case "${gpu_type:-cpu}" in
@@ -94,7 +97,7 @@ select_models() {
 
 configure_webui() {
     if whiptail --title "Open WebUI" \
-        --yesno "Enable Open WebUI (web-based chat interface)?\n\nAccessible at http://<this-ip>:8080" \
+        --yesno "Enable Open WebUI (web-based chat interface)?\n\nAccessible at http://127.0.0.1:8080 (localhost only)\nFor remote access, configure a reverse proxy." \
         10 60; then
         systemctl enable --now open-webui.service
         log "Open WebUI enabled"
@@ -105,43 +108,15 @@ configure_webui() {
 }
 
 configure_access() {
-    local choice
-    choice=$(whiptail --title "Remote Access" \
-        --radiolist "Select Ollama network access mode:" \
-        12 60 3 \
-        "local"     "Localhost only (127.0.0.1:11434)"  OFF \
-        "lan"       "LAN access (0.0.0.0:11434)"        ON \
-        "custom"    "Custom bind address"                OFF \
-        3>&1 1>&2 2>&3) || return 0
-
-    case "$choice" in
-        local)
-            sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=127.0.0.1:11434/' /etc/default/ollama
-            ;;
-        lan)
-            sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=0.0.0.0:11434/' /etc/default/ollama
-            ;;
-        custom)
-            local addr
-            addr=$(whiptail --title "Custom Address" \
-                --inputbox "Enter bind address (host:port):" \
-                8 60 "0.0.0.0:11434" 3>&1 1>&2 2>&3) || return 0
-            sed -i "s/OLLAMA_HOST=.*/OLLAMA_HOST=$addr/" /etc/default/ollama
-            ;;
-    esac
-
-configure_access() {
     # Force 127.0.0.1 for security
     sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=127.0.0.1:11434/' /etc/default/ollama
-    systemctl restart ollama.service 2>/dev/null || true
+    systemctl restart ollama.service
     log "Ollama bound to 127.0.0.1:11434 (Local only)"
 }
 
 show_summary() {
     local gpu_type="cpu"
-    if [ -f "$CONF_DIR/gpu.conf" ]; then
-        gpu_type=$(grep '^GPU_TYPE=' "$CONF_DIR/gpu.conf" | cut -d= -f2 | tr -d '"')
-    fi
+    [ -f "$CONF_DIR/gpu.conf" ] && gpu_type=$(grep '^GPU_TYPE=' "$CONF_DIR/gpu.conf" 2>/dev/null | cut -d= -f2 || echo "cpu")
 
     local ip_addr
     ip_addr=$(hostname -I | awk '{print $1}')
@@ -155,7 +130,7 @@ GPU: ${gpu_type:-cpu}\n\
 Ollama API: http://127.0.0.1:11434 (Local only)\n\
 Open WebUI: http://127.0.0.1:8080 (Local only)\n\n\
 Models:\n${models}\n\n\
-SSH: ssh $(whoami)@${ip_addr:-localhost}\n\n\
+SSH: ssh $username@${ip_addr:-localhost}\n\n\
 Note: For remote access, configure an SSH tunnel or reverse proxy." \
         22 65
 }

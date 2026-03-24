@@ -10,12 +10,12 @@ lb config noauto \
     --parent-distribution noble \
     --parent-archive-areas "main restricted universe multiverse" \
     --archive-areas "main restricted universe multiverse" \
-    --parent-mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-binary "http://archive.ubuntu.com/ubuntu/" \
-    --mirror-bootstrap "http://archive.ubuntu.com/ubuntu/" \
-    --mirror-chroot "http://archive.ubuntu.com/ubuntu/" \
-    --mirror-binary "http://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-binary "https://archive.ubuntu.com/ubuntu/" \
+    --mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
+    --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
+    --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
     --architectures amd64 \
     --binary-images iso-hybrid \
     --system live \

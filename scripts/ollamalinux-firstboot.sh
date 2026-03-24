@@ -37,8 +37,13 @@ create_user() {
         --passwordbox "Password for $username:" \
         8 60 3>&1 1>&2 2>&3) || return 0
 
+    if [ ${#password} -lt 8 ]; then
+        whiptail --msgbox "Password must be at least 8 characters." 8 60
+        return 1
+    fi
     useradd -m -s /bin/bash -G sudo,ollama "$username" 2>/dev/null || true
-    echo "$username:$password" | chpasswd
+    printf '%s:%s\n' "$username" "$password" | chpasswd
+    unset password
     log "User created: $username"
 }
 
@@ -107,8 +112,8 @@ configure_access() {
     choice=$(whiptail --title "Remote Access" \
         --radiolist "Select Ollama network access mode:" \
         12 60 3 \
-        "local"     "Localhost only (127.0.0.1:11434)"  OFF \
-        "lan"       "LAN access (0.0.0.0:11434)"        ON \
+        "local"     "Localhost only (127.0.0.1:11434)"  ON \
+        "lan"       "LAN access (0.0.0.0:11434)"        OFF \
         "custom"    "Custom bind address"                OFF \
         3>&1 1>&2 2>&3) || return 0
 

@@ -3,8 +3,13 @@ set -euo pipefail
 
 echo ">>> Installing Ollama..."
 
-# Download and install Ollama
-curl -fsSL https://ollama.com/install.sh | sh
+# Download Ollama binary directly (avoid curl|sh for security)
+OLLAMA_VERSION="0.6.2"
+curl -fsSL "https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/ollama-linux-amd64.tgz" \
+    -o /tmp/ollama.tgz
+tar -xzf /tmp/ollama.tgz -C /usr
+rm -f /tmp/ollama.tgz
+chmod +x /usr/bin/ollama
 
 # Create ollama user and group
 useradd -r -s /bin/false -U -m -d /var/lib/ollama ollama 2>/dev/null || true
@@ -15,7 +20,7 @@ chown -R ollama:ollama /var/lib/ollama
 
 # Set default environment
 cat > /etc/default/ollama <<'ENVEOF'
-OLLAMA_HOST=0.0.0.0:11434
+OLLAMA_HOST=127.0.0.1:11434
 OLLAMA_MODELS=/var/lib/ollama/models
 OLLAMA_NUM_PARALLEL=4
 OLLAMA_MAX_LOADED_MODELS=2

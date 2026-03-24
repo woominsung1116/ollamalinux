@@ -1,5 +1,8 @@
 name: Build OllamaLinux ISO
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]

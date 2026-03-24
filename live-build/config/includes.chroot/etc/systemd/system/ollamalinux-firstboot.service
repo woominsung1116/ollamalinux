@@ -6,6 +6,10 @@ ConditionPathExists=!/etc/ollamalinux/.firstboot-done
 [Service]
 Type=oneshot
 ExecStart=/usr/local/bin/ollamalinux-firstboot
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
 StandardInput=tty
 StandardOutput=tty
 TTYPath=/dev/tty1

@@ -21,7 +21,7 @@ cat > /etc/ollamalinux/open-webui.conf <<'CONF'
 OPEN_WEBUI_PORT=8080
 OLLAMA_BASE_URL=http://127.0.0.1:11434
 DATA_DIR=/opt/open-webui/data
-WEBUI_AUTH=false
+WEBUI_AUTH=true
 CONF
 
 echo ">>> Open WebUI installed successfully."

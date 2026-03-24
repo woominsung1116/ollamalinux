@@ -99,6 +99,11 @@ jobs:
           # (replaced by rsvg-convert in Ubuntu Noble). Without this file, the
           # SVG rendering step is skipped entirely.
           rm -f config/bootloaders/isolinux/splash.svg.in
+          # Step 5: Ensure bootlogo exists (script unconditionally reads it as cpio)
+          # If it was a broken symlink that got deleted, create an empty cpio archive
+          if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
+            (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo
+          fi
           echo "=== local bootloader template ==="
           ls -la config/bootloaders/isolinux/
 

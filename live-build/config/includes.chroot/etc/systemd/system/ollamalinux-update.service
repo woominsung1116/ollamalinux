@@ -1,0 +1,22 @@
+[Unit]
+Description=OllamaLinux Update Check
+After=network-online.target
+Wants=network-online.target
+Documentation=https://github.com/ollama/ollama
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ollamalinux-update --check
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ollamalinux-update
+
+# Security hardening
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+PrivateTmp=true

@@ -4,7 +4,9 @@ set -euo pipefail
 echo ">>> Installing Ollama..."
 
 # Download Ollama binary directly (avoid curl|sh for security)
-OLLAMA_VERSION="0.6.2"
+# Auto-detect latest version from GitHub API, fallback to pinned version
+OLLAMA_VERSION="${OLLAMA_VERSION:-$(curl -fsSL https://api.github.com/repos/ollama/ollama/releases/latest 2>/dev/null | grep -o '"tag_name":"[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//' || echo "0.6.2")}"
+echo "  Ollama version: ${OLLAMA_VERSION}"
 DEB_ARCH="$(dpkg --print-architecture)"
 curl -fsSL "https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/ollama-linux-${DEB_ARCH}.tgz" \
     -o /tmp/ollama.tgz

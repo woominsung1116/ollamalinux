@@ -20,6 +20,11 @@ on:
           - server
           - desktop
           - both
+      models:
+        description: 'Comma-separated models to preload (e.g. llama3.2:1b,nomic-embed-text). Leave empty to skip.'
+        required: false
+        default: ''
+        type: string
 
 jobs:
   build-server:
@@ -80,6 +85,8 @@ jobs:
           rm -f config/package-lists/desktop.list.chroot
 
       - name: Build Server ISO
+        env:
+          PRELOAD_MODELS: ${{ github.event.inputs.models || '' }}
         run: |
           cd live-build
           chmod +x auto/*

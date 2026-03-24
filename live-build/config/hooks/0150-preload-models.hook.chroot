@@ -1,0 +1,78 @@
+#!/bin/bash
+set -euo pipefail
+
+echo ">>> Preload models hook starting..."
+
+# PRELOAD_MODELS: comma-separated list of models to pull during build
+# e.g. PRELOAD_MODELS="llama3.2:1b,nomic-embed-text"
+# Default: empty (no preload)
+PRELOAD_MODELS="${PRELOAD_MODELS:-}"
+
+if [ -z "$PRELOAD_MODELS" ]; then
+    echo ">>> PRELOAD_MODELS is empty, skipping model preload."
+    exit 0
+fi
+
+echo ">>> Models to preload: $PRELOAD_MODELS"
+echo ">>> WARNING: Each model may add 1-8GB to the ISO size."
+
+# Ensure ollama binary exists
+if [ ! -x /usr/local/bin/ollama ] && [ ! -x /usr/bin/ollama ]; then
+    echo ">>> WARNING: ollama binary not found, skipping model preload."
+    exit 0
+fi
+
+OLLAMA_BIN="$(command -v ollama)"
+
+# Ensure model storage directory exists with correct ownership
+mkdir -p /var/lib/ollama/models
+chown -R ollama:ollama /var/lib/ollama 2>/dev/null || true
+
+# Start ollama server in background as the ollama user
+export OLLAMA_HOST="127.0.0.1:11434"
+export OLLAMA_MODELS="/var/lib/ollama/models"
+
+echo ">>> Starting ollama server in background..."
+su -s /bin/sh -c "OLLAMA_HOST=$OLLAMA_HOST OLLAMA_MODELS=$OLLAMA_MODELS $OLLAMA_BIN serve" ollama &
+OLLAMA_PID=$!
+
+# Wait for server to be ready (up to 30 seconds)
+READY=0
+for i in $(seq 1 30); do
+    if curl -sf "http://127.0.0.1:11434/" >/dev/null 2>&1; then
+        READY=1
+        break
+    fi
+    sleep 1
+done
+
+if [ "$READY" -eq 0 ]; then
+    echo ">>> WARNING: ollama server did not start within 30s, skipping model preload."
+    kill "$OLLAMA_PID" 2>/dev/null || true
+    exit 0
+fi
+
+echo ">>> ollama server is ready."
+
+# Pull each model; warn on failure but do not abort the build
+IFS=',' read -ra MODEL_LIST <<< "$PRELOAD_MODELS"
+for MODEL in "${MODEL_LIST[@]}"; do
+    MODEL="$(echo "$MODEL" | tr -d '[:space:]')"
+    [ -z "$MODEL" ] && continue
+    echo ">>> Pulling model: $MODEL"
+    if ! OLLAMA_HOST="$OLLAMA_HOST" "$OLLAMA_BIN" pull "$MODEL"; then
+        echo ">>> WARNING: Failed to pull model '$MODEL', continuing..."
+    else
+        echo ">>> Model '$MODEL' pulled successfully."
+    fi
+done
+
+# Shut down the server
+echo ">>> Stopping ollama server (PID $OLLAMA_PID)..."
+kill "$OLLAMA_PID" 2>/dev/null || true
+wait "$OLLAMA_PID" 2>/dev/null || true
+
+# Fix permissions on downloaded models
+chown -R ollama:ollama /var/lib/ollama 2>/dev/null || true
+
+echo ">>> Model preload complete."

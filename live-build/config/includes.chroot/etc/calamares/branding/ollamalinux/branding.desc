@@ -1,0 +1,32 @@
+# OllamaLinux branding descriptor
+
+componentName: ollamalinux
+
+welcomeStyleCalamares: false
+
+welcomeExpandingLogo: true
+
+strings:
+    productName:         OllamaLinux
+    shortProductName:    OllamaLinux
+    version:             1.0
+    shortVersion:        1.0
+    versionedName:       OllamaLinux 1.0
+    shortVersionedName:  OllamaLinux 1.0
+    bootloaderEntryName: OllamaLinux
+    productUrl:          https://github.com/woominseong/ollama
+    supportUrl:          https://github.com/woominseong/ollama/issues
+    knownIssuesUrl:      https://github.com/woominseong/ollama/issues
+    releaseNotesUrl:     https://github.com/woominseong/ollama
+
+images:
+    productLogo:         "logo.png"
+    productIcon:         "logo.png"
+    productWelcome:      "languages.png"
+
+slideshow:               "show.qml"
+
+style:
+    sidebarBackground:   "#1a1a2e"
+    sidebarText:         "#ffffff"
+    sidebarTextSelect:   "#4fc3f7"

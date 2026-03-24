@@ -4,7 +4,7 @@ set -euo pipefail
 echo ">>> Cleaning up..."
 
 apt-get clean
-rm -rf /var/lib/apt/lists/*
+# Do NOT remove /var/lib/apt/lists/ - live-build needs it for subsequent stages
 rm -rf /tmp/*
 rm -rf /var/tmp/*
 

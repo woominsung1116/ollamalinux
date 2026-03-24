@@ -95,6 +95,10 @@ jobs:
           cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
           # Step 3: Remove any remaining broken symlinks
           find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+          # Step 4: Remove splash.svg.in - the script uses obsolete 'rsvg' command
+          # (replaced by rsvg-convert in Ubuntu Noble). Without this file, the
+          # SVG rendering step is skipped entirely.
+          rm -f config/bootloaders/isolinux/splash.svg.in
           echo "=== local bootloader template ==="
           ls -la config/bootloaders/isolinux/
 

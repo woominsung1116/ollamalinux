@@ -58,7 +58,7 @@ detect_gpu() {
     [ -f "$CONF_DIR/gpu.conf" ] && gpu_type=$(grep '^GPU_TYPE=' "$CONF_DIR/gpu.conf" 2>/dev/null | cut -d= -f2 || echo "cpu")
 
     local msg
-    case "${GPU_TYPE:-cpu}" in
+    case "${gpu_type:-cpu}" in
         nvidia) msg="NVIDIA GPU detected.\nCUDA drivers installed successfully." ;;
         rocm)   msg="AMD GPU detected.\nROCm drivers installed successfully." ;;
         intel)  msg="Intel GPU detected.\nOneAPI drivers installed successfully." ;;
@@ -126,7 +126,7 @@ show_summary() {
 
     whiptail --title "Setup Complete!" \
         --msgbox "OllamaLinux is ready!\n\n\
-GPU: ${GPU_TYPE:-cpu}\n\
+GPU: ${gpu_type:-cpu}\n\
 Ollama API: http://127.0.0.1:11434 (Local only)\n\
 Open WebUI: http://127.0.0.1:8080 (Local only)\n\n\
 Models:\n${models}\n\n\

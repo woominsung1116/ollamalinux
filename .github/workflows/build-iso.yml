@@ -82,19 +82,12 @@ jobs:
           cd live-build
           chmod +x auto/*
 
-          # Patch live-build scripts for Ubuntu Noble compatibility:
-          # 1. lb_binary_iso: genisoimage has 4GB file limit, add -allow-limited-size
-          #    for large squashfs (Ollama+CUDA images exceed 4GB)
+          # Patch lb_binary_iso: genisoimage has 4GB file limit, add -allow-limited-size
+          # for large squashfs (Ollama+CUDA images exceed 4GB)
           LB_ISO_SCRIPT="/usr/lib/live/build/lb_binary_iso"
           if sudo grep -q 'genisoimage' "$LB_ISO_SCRIPT" 2>/dev/null; then
             echo "Patching lb_binary_iso for >4GB squashfs support..."
             sudo sed -i 's/genisoimage\b/genisoimage -allow-limited-size/g' "$LB_ISO_SCRIPT"
-          fi
-          # 2. lb_binary_grub2: grub-mkimage needs -p prefix
-          LB_GRUB2_SCRIPT="/usr/lib/live/build/lb_binary_grub2"
-          if sudo grep -q 'grub-mkimage' "$LB_GRUB2_SCRIPT" 2>/dev/null; then
-            echo "Patching lb_binary_grub2 for grub-mkimage prefix..."
-            sudo sed -i 's/grub-mkimage\b/grub-mkimage -p \/boot\/grub/g' "$LB_GRUB2_SCRIPT"
           fi
 
           sudo lb config

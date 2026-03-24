@@ -34,12 +34,13 @@ cmd_info() {
 }
 
 cmd_recommend() {
-    source /etc/ollamalinux/gpu.conf 2>/dev/null || true
+    local gpu_type
+    gpu_type=$(get_conf_value "/etc/ollamalinux/gpu.conf" "GPU_TYPE" "cpu")
     local total_ram
     total_ram=$(free -g | awk '/Mem:/{print $2}')
     local gpu_vram=0
 
-    if [ "${GPU_TYPE:-cpu}" = "nvidia" ]; then
+    if [ "$gpu_type" = "nvidia" ]; then
         gpu_vram=$(nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>/dev/null | head -1) || gpu_vram=0
     fi
 

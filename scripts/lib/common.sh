@@ -4,6 +4,24 @@
 OLLAMALINUX_VERSION="0.1.0"
 OLLAMALINUX_CONF="/etc/ollamalinux"
 
+# Safe configuration value extractor (avoids source)
+get_conf_value() {
+    local file="$1"
+    local key="$2"
+    local default="${3:-}"
+    
+    if [ ! -f "$file" ]; then
+        echo "$default"
+        return
+    fi
+    
+    # Extract value using grep/sed, handle quotes if present
+    local value
+    value=$(grep "^${key}=" "$file" | head -1 | cut -d'=' -f2- | sed "s/^['\"]//;s/['\"]$//")
+    
+    echo "${value:-$default}"
+}
+
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }

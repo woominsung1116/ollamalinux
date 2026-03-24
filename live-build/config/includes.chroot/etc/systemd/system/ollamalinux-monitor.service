@@ -7,6 +7,12 @@ Type=simple
 ExecStart=/usr/local/bin/ollamalinux-monitor live
 Restart=on-failure
 RestartSec=10
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+ReadOnlyPaths=/
+ReadWritePaths=/tmp
 
 [Install]
 WantedBy=multi-user.target

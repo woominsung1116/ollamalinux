@@ -108,36 +108,10 @@ configure_webui() {
 }
 
 configure_access() {
-    local choice
-    choice=$(whiptail --title "Remote Access" \
-        --radiolist "Select Ollama network access mode:" \
-        12 60 3 \
-        "local"     "Localhost only (127.0.0.1:11434)"  ON \
-        "lan"       "LAN access (0.0.0.0:11434)"        OFF \
-        "custom"    "Custom bind address"                OFF \
-        3>&1 1>&2 2>&3) || return 0
-
-    case "$choice" in
-        local)
-            sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=127.0.0.1:11434/' /etc/default/ollama
-            ;;
-        lan)
-            sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=0.0.0.0:11434/' /etc/default/ollama
-            ;;
-        custom)
-            local addr
-            addr=$(whiptail --title "Custom Address" \
-                --inputbox "Enter bind address (host:port):" \
-                8 60 "0.0.0.0:11434" 3>&1 1>&2 2>&3) || return 0
-            # Escape sed special characters in user input
-            local escaped_addr
-            escaped_addr=$(printf '%s\n' "$addr" | sed 's/[&/\]/\\&/g')
-            sed -i "s/OLLAMA_HOST=.*/OLLAMA_HOST=$escaped_addr/" /etc/default/ollama
-            ;;
-    esac
-
+    # Force 127.0.0.1 for security
+    sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=127.0.0.1:11434/' /etc/default/ollama
     systemctl restart ollama.service
-    log "Access mode: $choice"
+    log "Ollama bound to 127.0.0.1:11434 (Local only)"
 }
 
 show_summary() {
@@ -153,14 +127,11 @@ show_summary() {
     whiptail --title "Setup Complete!" \
         --msgbox "OllamaLinux is ready!\n\n\
 GPU: ${GPU_TYPE:-cpu}\n\
-Ollama API: http://${ip_addr:-localhost}:11434\n\
-Open WebUI: http://${ip_addr:-localhost}:8080\n\n\
+Ollama API: http://127.0.0.1:11434 (Local only)\n\
+Open WebUI: http://127.0.0.1:8080 (Local only)\n\n\
 Models:\n${models}\n\n\
 SSH: ssh $username@${ip_addr:-localhost}\n\n\
-Commands:\n\
-  ollamalinux-models   - Manage AI models\n\
-  ollamalinux-monitor  - System monitoring\n\
-  ollama run <model>   - Chat in terminal" \
+Note: For remote access, configure an SSH tunnel or reverse proxy." \
         22 65
 }
 

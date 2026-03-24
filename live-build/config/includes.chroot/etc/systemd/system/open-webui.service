@@ -15,6 +15,10 @@ ExecStart=/opt/open-webui/venv/bin/open-webui serve --host 127.0.0.1 --port 8080
 Restart=always
 RestartSec=5
 LimitNOFILE=65536
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
 Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434
 Environment=WEBUI_AUTH=true
 Environment=DATA_DIR=/opt/open-webui/data

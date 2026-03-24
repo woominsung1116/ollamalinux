@@ -26,7 +26,8 @@ cd - > /dev/null
 
 tar -xzf "/tmp/${OLLAMA_TGZ}" -C /usr
 rm -f "/tmp/${OLLAMA_TGZ}" /tmp/sha256sum.txt
-chmod +x /usr/bin/ollama \
+chmod +x /usr/bin/ollama
+
 # Ensure ollama is available at /usr/local/bin (service ExecStart path)
 ln -sf /usr/bin/ollama /usr/local/bin/ollama
 

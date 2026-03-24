@@ -85,6 +85,7 @@ jobs:
           # Create local bootloader config with real files (not symlinks)
           # lb_binary_syslinux prefers config/bootloaders/isolinux/ over system template.
           # Step 1: Copy template preserving structure (symlinks kept as-is)
+          mkdir -p config/bootloaders
           cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
           # Step 2: Replace broken symlinks with real binary files
           cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true

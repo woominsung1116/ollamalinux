@@ -17,7 +17,7 @@ lb config noauto \
     --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
     --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
     --architectures amd64 \
-    --binary-images iso-hybrid \
+    --binary-images iso \
     --mode debian \
     --system live \
     --linux-flavours generic \

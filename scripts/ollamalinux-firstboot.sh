@@ -9,6 +9,7 @@ source /usr/local/bin/lib/gpu.sh 2>/dev/null || true
 CONF_DIR="/etc/ollamalinux"
 FIRSTBOOT_FLAG="/etc/ollamalinux/.firstboot-done"
 LOG="/var/log/ollamalinux-firstboot.log"
+username="user"  # default, overwritten by create_user
 
 log() { echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG"; }
 
@@ -28,7 +29,7 @@ configure_hostname() {
 }
 
 create_user() {
-    local username password
+    local password
     username=$(whiptail --title "User Account" \
         --inputbox "Create an admin user account.\n\nUsername:" \
         10 60 "ai" 3>&1 1>&2 2>&3) || return 0

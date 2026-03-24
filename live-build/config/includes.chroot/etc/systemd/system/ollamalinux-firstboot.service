@@ -10,6 +10,7 @@ ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectControlGroups=true
 RestrictSUIDSGID=true
+NoNewPrivileges=true
 StandardInput=tty
 StandardOutput=tty
 TTYPath=/dev/tty1

@@ -41,8 +41,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y live-build debootstrap xorriso \
             grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed \
-            shim-signed mtools dosfstools squashfs-tools syslinux \
-            syslinux-utils isolinux genisoimage
+            shim-signed mtools dosfstools squashfs-tools
 
       - name: Prepare build
         run: |
@@ -81,31 +80,6 @@ jobs:
         run: |
           cd live-build
           chmod +x auto/*
-
-          # Create local bootloader config with real files (not symlinks)
-          # lb_binary_syslinux prefers config/bootloaders/isolinux/ over system template.
-          # Step 1: Copy template preserving structure (symlinks kept as-is)
-          mkdir -p config/bootloaders
-          cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
-          # Step 2: Replace broken symlinks with real binary files
-          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          # Step 3: Remove any remaining broken symlinks
-          find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
-          # Step 4: Remove splash.svg.in - the script uses obsolete 'rsvg' command
-          # (replaced by rsvg-convert in Ubuntu Noble). Without this file, the
-          # SVG rendering step is skipped entirely.
-          rm -f config/bootloaders/isolinux/splash.svg.in
-          # Step 5: Ensure bootlogo exists (script unconditionally reads it as cpio)
-          # If it was a broken symlink that got deleted, create an empty cpio archive
-          if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
-            (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo
-          fi
-          echo "=== local bootloader template ==="
-          ls -la config/bootloaders/isolinux/
 
           sudo lb config
           sudo lb build 2>&1 || true
@@ -152,8 +126,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y live-build debootstrap xorriso \
             grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed \
-            shim-signed mtools dosfstools squashfs-tools syslinux \
-            syslinux-utils isolinux genisoimage
+            shim-signed mtools dosfstools squashfs-tools
 
       - name: Prepare build
         run: |

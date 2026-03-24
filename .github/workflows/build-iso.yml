@@ -82,32 +82,6 @@ jobs:
           cd live-build
           chmod +x auto/*
 
-          # Dump lb_binary_syslinux script for debugging
-          echo "=== lb_binary_syslinux full content ==="
-          sudo cat /usr/lib/live/build/lb_binary_syslinux 2>/dev/null || echo "Script not found"
-          echo "=== end script ==="
-
-          # Provide isolinux files everywhere lb_binary_syslinux might look:
-          # 1. Host /root/isolinux/ (for host-side operations)
-          sudo mkdir -p /root/isolinux
-          sudo cp /usr/lib/ISOLINUX/isolinux.bin /root/isolinux/ 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/vesamenu.c32 /root/isolinux/ 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/ldlinux.c32 /root/isolinux/ 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/libcom32.c32 /root/isolinux/ 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/libutil.c32 /root/isolinux/ 2>/dev/null || true
-          sudo cp /usr/lib/syslinux/modules/bios/menu.c32 /root/isolinux/ 2>/dev/null || true
-          sudo ls -la /root/isolinux/
-
-          # 2. Chroot overlay (for chroot-side operations)
-          mkdir -p config/includes.chroot/root/isolinux
-          cp /usr/lib/ISOLINUX/isolinux.bin config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          cp /usr/lib/syslinux/modules/bios/ldlinux.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          cp /usr/lib/syslinux/modules/bios/libcom32.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          cp /usr/lib/syslinux/modules/bios/libutil.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          cp /usr/lib/syslinux/modules/bios/menu.c32 config/includes.chroot/root/isolinux/ 2>/dev/null || true
-          ls -la config/includes.chroot/root/isolinux/
-
           sudo lb config
           sudo lb build 2>&1 || true
 

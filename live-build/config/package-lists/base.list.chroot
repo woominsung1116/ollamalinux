@@ -46,3 +46,5 @@ pigz
 grub-common
 grub-pc-bin
 grub-efi-amd64-bin
+isolinux
+syslinux-common

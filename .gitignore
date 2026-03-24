@@ -30,3 +30,4 @@ live-build/config/bootstrap
 live-build/config/chroot
 live-build/config/common
 live-build/config/source
+.omc/

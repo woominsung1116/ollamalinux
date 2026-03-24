@@ -250,7 +250,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y live-build debootstrap xorriso \
-            grub-efi-arm64-bin mtools dosfstools squashfs-tools \
+            grub-efi-amd64-bin mtools dosfstools squashfs-tools \
             qemu-user-static binfmt-support
 
       - name: Prepare build

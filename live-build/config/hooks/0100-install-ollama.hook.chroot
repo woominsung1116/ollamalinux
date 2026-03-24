@@ -8,11 +8,25 @@ echo ">>> Installing Ollama..."
 OLLAMA_VERSION="${OLLAMA_VERSION:-$(curl -fsSL https://api.github.com/repos/ollama/ollama/releases/latest 2>/dev/null | grep -o '"tag_name":"[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//' || echo "0.6.2")}"
 echo "  Ollama version: ${OLLAMA_VERSION}"
 DEB_ARCH="$(dpkg --print-architecture)"
-curl -fsSL "https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/ollama-linux-${DEB_ARCH}.tgz" \
-    -o /tmp/ollama.tgz
-tar -xzf /tmp/ollama.tgz -C /usr
-rm -f /tmp/ollama.tgz
-chmod +x /usr/bin/ollama
+OLLAMA_TGZ="ollama-linux-${DEB_ARCH}.tgz"
+OLLAMA_URL="https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/${OLLAMA_TGZ}"
+
+echo "  Downloading from: ${OLLAMA_URL}"
+curl -fsSL "${OLLAMA_URL}" -o "/tmp/${OLLAMA_TGZ}"
+
+# Verify SHA256 checksum (security: prevent tampered binaries)
+echo "  Verifying SHA256 checksum..."
+CHECKSUM_URL="https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/sha256sum.txt"
+curl -fsSL "${CHECKSUM_URL}" -o /tmp/sha256sum.txt
+cd /tmp && grep "${OLLAMA_TGZ}" sha256sum.txt | sha256sum -c - || {
+    echo ">>> ERROR: SHA256 checksum verification failed for ${OLLAMA_TGZ}"
+    exit 1
+}
+cd - > /dev/null
+
+tar -xzf "/tmp/${OLLAMA_TGZ}" -C /usr
+rm -f "/tmp/${OLLAMA_TGZ}" /tmp/sha256sum.txt
+chmod +x /usr/bin/ollama \
 # Ensure ollama is available at /usr/local/bin (service ExecStart path)
 ln -sf /usr/bin/ollama /usr/local/bin/ollama
 

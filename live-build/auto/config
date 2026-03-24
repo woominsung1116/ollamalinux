@@ -8,17 +8,24 @@ set -e
 # Architecture can be overridden via ARCH env variable (e.g. ARCH=arm64)
 ARCH="${ARCH:-amd64}"
 
+# Select mirror based on architecture
+if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
+    MIRROR="http://ports.ubuntu.com/ubuntu-ports/"
+else
+    MIRROR="https://archive.ubuntu.com/ubuntu/"
+fi
+
 lb config noauto \
     --distribution noble \
     --parent-distribution noble \
     --parent-archive-areas "main restricted universe multiverse" \
     --archive-areas "main restricted universe multiverse" \
-    --parent-mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-binary "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
+    --parent-mirror-bootstrap "${MIRROR}" \
+    --parent-mirror-chroot "${MIRROR}" \
+    --parent-mirror-binary "${MIRROR}" \
+    --mirror-bootstrap "${MIRROR}" \
+    --mirror-chroot "${MIRROR}" \
+    --mirror-binary "${MIRROR}" \
     --architectures "${ARCH}" \
     --binary-images iso \
     --mode debian \

@@ -114,7 +114,7 @@ jobs:
             sudo mv live-build/binary.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || true
           sudo chown -R runner:runner output/
           cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
-          ls -lh output/
+          ls -lh .
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4
@@ -209,7 +209,7 @@ jobs:
             sudo mv live-build/binary.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || true
           sudo chown -R runner:runner output/
           cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
-          ls -lh output/
+          ls -lh .
 
       - name: Upload ISO artifact
         uses: actions/upload-artifact@v4

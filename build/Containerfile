@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     grub-pc-bin \
     grub-efi-amd64-bin \
     grub-efi-amd64-signed \
+    grub-efi-arm64-bin \
     shim-signed \
     mtools \
     dosfstools \

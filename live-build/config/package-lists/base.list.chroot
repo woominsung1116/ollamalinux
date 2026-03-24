@@ -43,6 +43,6 @@ whiptail
 dialog
 zstd
 pigz
-grub-pc
-grub-efi-amd64
 grub-common
+grub-pc-bin
+grub-efi-amd64-bin

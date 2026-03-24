@@ -349,4 +349,3 @@ jobs:
           files: |
             artifacts/**/SHA256SUMS
           generate_release_notes: true
-          generate_release_notes: true

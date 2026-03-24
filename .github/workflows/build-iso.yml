@@ -232,8 +232,7 @@ jobs:
   build-arm64:
     # Disabled for v0.1.0: QEMU cross-build fails with binfmt issues
     # TODO: Fix ARM64 cross-compilation or use native ARM64 runner
-    if: >-
-      false &&
+    if: false
       github.event.inputs.flavor == 'server' ||
       github.event.inputs.flavor == 'both'
     runs-on: ubuntu-24.04

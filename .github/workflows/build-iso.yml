@@ -183,6 +183,8 @@ jobs:
           chmod +x config/hooks/*.hook.chroot 2>/dev/null || true
 
       - name: Build Desktop ISO
+        env:
+          PRELOAD_MODELS: ${{ github.event.inputs.models || '' }}
         run: |
           cd live-build
           chmod +x auto/*
@@ -285,6 +287,7 @@ jobs:
       - name: Build ARM64 Server ISO
         env:
           ARCH: arm64
+          PRELOAD_MODELS: ${{ github.event.inputs.models || '' }}
         run: |
           cd live-build
           chmod +x auto/*

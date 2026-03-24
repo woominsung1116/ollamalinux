@@ -348,19 +348,5 @@ jobs:
         with:
           files: |
             artifacts/**/SHA256SUMS
-          body: |
-            ## OllamaLinux ${{ github.ref_name }}
-
-            AI-ready Linux distribution with Ollama + Open WebUI pre-installed.
-
-            ### Download ISO
-            The ISO file (5.6GB) exceeds GitHub's 2GB release asset limit.
-            Download from **GitHub Actions artifacts**:
-            [Build Artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-
-            ### Verify
-            ```bash
-            sha256sum -c SHA256SUMS
-            ```
           generate_release_notes: true
           generate_release_notes: true

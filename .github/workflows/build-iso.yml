@@ -1,0 +1,199 @@
+name: Build OllamaLinux ISO
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: 'ISO flavor to build'
+        required: true
+        default: 'server'
+        type: choice
+        options:
+          - server
+          - desktop
+          - both
+
+jobs:
+  build-server:
+    if: >-
+      github.event_name != 'workflow_dispatch' ||
+      github.event.inputs.flavor == 'server' ||
+      github.event.inputs.flavor == 'both'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          sudo apt-get clean
+          df -h /
+
+      - name: Install live-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap xorriso \
+            grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed \
+            shim-signed mtools dosfstools squashfs-tools syslinux \
+            syslinux-utils isolinux genisoimage
+
+      - name: Prepare build
+        run: |
+          cd live-build
+
+          # Copy scripts into chroot overlay
+          mkdir -p config/includes.chroot/usr/local/bin/lib
+          cp -r ../scripts/*.sh config/includes.chroot/usr/local/bin/ 2>/dev/null || true
+          cp -r ../scripts/lib/*.sh config/includes.chroot/usr/local/bin/lib/ 2>/dev/null || true
+          chmod +x config/includes.chroot/usr/local/bin/*.sh 2>/dev/null || true
+          chmod +x config/includes.chroot/usr/local/bin/lib/*.sh 2>/dev/null || true
+
+          # Rename scripts (remove .sh extension for cleaner CLI)
+          for f in config/includes.chroot/usr/local/bin/*.sh; do
+            [ -f "$f" ] && mv "$f" "${f%.sh}"
+          done
+
+          # Copy branding
+          if [ -d ../branding/grub ]; then
+            mkdir -p config/includes.binary/boot/grub/themes/ollamalinux/
+            cp ../branding/grub/* config/includes.binary/boot/grub/themes/ollamalinux/ 2>/dev/null || true
+          fi
+
+          if [ -d ../branding/plymouth ]; then
+            mkdir -p config/includes.chroot/usr/share/plymouth/themes/ollamalinux/
+            cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
+          fi
+
+          # Remove desktop packages for server build
+          rm -f config/package-lists/desktop.list.chroot
+
+      - name: Build Server ISO
+        run: |
+          cd live-build
+          chmod +x auto/*
+          chmod +x config/hooks/live/*.hook.chroot
+
+          sudo lb config
+          sudo lb build
+
+      - name: Collect output
+        run: |
+          mkdir -p output
+          VERSION=$(cat VERSION)
+          mv live-build/*.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || \
+            mv live-build/binary.hybrid.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || true
+          cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
+          ls -lh output/
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ollamalinux-server-iso
+          path: |
+            output/*.iso
+            output/SHA256SUMS
+          retention-days: 30
+
+  build-desktop:
+    if: >-
+      github.event.inputs.flavor == 'desktop' ||
+      github.event.inputs.flavor == 'both'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Free disk space
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache
+          sudo apt-get clean
+          df -h /
+
+      - name: Install live-build
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y live-build debootstrap xorriso \
+            grub-pc-bin grub-efi-amd64-bin grub-efi-amd64-signed \
+            shim-signed mtools dosfstools squashfs-tools syslinux \
+            syslinux-utils isolinux genisoimage
+
+      - name: Prepare build
+        run: |
+          cd live-build
+
+          mkdir -p config/includes.chroot/usr/local/bin/lib
+          cp -r ../scripts/*.sh config/includes.chroot/usr/local/bin/ 2>/dev/null || true
+          cp -r ../scripts/lib/*.sh config/includes.chroot/usr/local/bin/lib/ 2>/dev/null || true
+          chmod +x config/includes.chroot/usr/local/bin/*.sh 2>/dev/null || true
+          chmod +x config/includes.chroot/usr/local/bin/lib/*.sh 2>/dev/null || true
+
+          for f in config/includes.chroot/usr/local/bin/*.sh; do
+            [ -f "$f" ] && mv "$f" "${f%.sh}"
+          done
+
+          if [ -d ../branding/grub ]; then
+            mkdir -p config/includes.binary/boot/grub/themes/ollamalinux/
+            cp ../branding/grub/* config/includes.binary/boot/grub/themes/ollamalinux/ 2>/dev/null || true
+          fi
+
+          if [ -d ../branding/plymouth ]; then
+            mkdir -p config/includes.chroot/usr/share/plymouth/themes/ollamalinux/
+            cp -r ../branding/plymouth/* config/includes.chroot/usr/share/plymouth/themes/ollamalinux/ 2>/dev/null || true
+          fi
+
+          # Keep desktop packages for desktop build
+
+      - name: Build Desktop ISO
+        run: |
+          cd live-build
+          chmod +x auto/*
+          chmod +x config/hooks/live/*.hook.chroot
+
+          sudo lb config
+          sudo lb build
+
+      - name: Collect output
+        run: |
+          mkdir -p output
+          VERSION=$(cat VERSION)
+          mv live-build/*.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || \
+            mv live-build/binary.hybrid.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || true
+          cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
+          ls -lh output/
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ollamalinux-desktop-iso
+          path: |
+            output/*.iso
+            output/SHA256SUMS
+          retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-server]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/**/*.iso
+            artifacts/**/SHA256SUMS
+          generate_release_notes: true

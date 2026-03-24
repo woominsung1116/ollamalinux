@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+echo ">>> Configuring services..."
+
+systemctl enable ollama.service
+systemctl enable open-webui.service
+systemctl enable ollamalinux-firstboot.service
+systemctl enable ssh.service
+
+echo ">>> Services configured."

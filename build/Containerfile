@@ -1,0 +1,32 @@
+FROM --platform=linux/amd64 docker.io/ubuntu:24.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    live-build \
+    debootstrap \
+    syslinux \
+    syslinux-utils \
+    isolinux \
+    xorriso \
+    grub-pc-bin \
+    grub-efi-amd64-bin \
+    grub-efi-amd64-signed \
+    shim-signed \
+    mtools \
+    dosfstools \
+    squashfs-tools \
+    genisoimage \
+    ca-certificates \
+    curl \
+    wget \
+    gnupg \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /build
+
+COPY build.sh /build/build.sh
+RUN chmod +x /build/build.sh
+
+ENTRYPOINT ["/build/build.sh"]

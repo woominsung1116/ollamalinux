@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=OllamaLinux
+Description=OllamaLinux boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/ollamalinux/images
+ScriptFile=/usr/share/plymouth/themes/ollamalinux/ollamalinux.script

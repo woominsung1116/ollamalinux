@@ -1,0 +1,33 @@
+title-text: "OllamaLinux"
+title-font: "DejaVu Sans Bold 24"
+title-color: "#ffffff"
+desktop-image: "background.png"
+desktop-color: "#0a0a0a"
+message-font: "DejaVu Sans 14"
+message-color: "#cccccc"
+message-bg-color: "#1a1a1a"
+terminal-font: "DejaVu Sans Mono 14"
+
++ boot_menu {
+    left = 25%
+    top = 30%
+    width = 50%
+    height = 40%
+    item_font = "DejaVu Sans 16"
+    item_color = "#aaaaaa"
+    selected_item_color = "#ffffff"
+    item_height = 36
+    item_padding = 12
+    item_spacing = 6
+    scrollbar = true
+}
+
++ label {
+    left = 50%-150
+    top = 90%
+    width = 300
+    text = "OllamaLinux - Local AI, Your Way"
+    font = "DejaVu Sans 12"
+    color = "#888888"
+    align = "center"
+}

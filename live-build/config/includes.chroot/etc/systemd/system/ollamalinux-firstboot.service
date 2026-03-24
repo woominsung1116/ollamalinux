@@ -1,0 +1,17 @@
+[Unit]
+Description=OllamaLinux First-Boot Configuration Wizard
+After=multi-user.target systemd-logind.service
+ConditionPathExists=!/etc/ollamalinux/.firstboot-done
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/ollamalinux-firstboot
+StandardInput=tty
+StandardOutput=tty
+TTYPath=/dev/tty1
+TTYReset=yes
+TTYVHangup=yes
+RemainAfterExit=no
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+# Build output
+output/
+*.iso
+
+# Build cache
+build/cache/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Temporary
+*.tmp
+*.log
+
+# OMC state
+.omc/
+live-build/cache/
+live-build/.build/
+live-build/chroot/
+live-build/config/binary
+live-build/config/bootstrap
+live-build/config/chroot
+live-build/config/common
+live-build/config/source

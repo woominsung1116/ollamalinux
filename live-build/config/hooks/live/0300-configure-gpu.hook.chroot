@@ -1,0 +1,20 @@
+#!/bin/bash
+set -euo pipefail
+
+echo ">>> Configuring GPU driver repositories..."
+
+# Add NVIDIA apt repository
+curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb \
+    -o /tmp/cuda-keyring.deb
+dpkg -i /tmp/cuda-keyring.deb
+rm /tmp/cuda-keyring.deb
+
+# Add ROCm repository for AMD
+mkdir -p /etc/apt/keyrings
+curl -fsSL https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor -o /etc/apt/keyrings/rocm.gpg
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/latest noble main" \
+    > /etc/apt/sources.list.d/rocm.list
+
+apt-get update
+
+echo ">>> GPU repositories configured. Drivers will be installed at first boot."

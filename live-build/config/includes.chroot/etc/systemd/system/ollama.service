@@ -1,0 +1,27 @@
+[Unit]
+Description=Ollama LLM Server
+Documentation=https://ollama.com
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ollama
+Group=ollama
+EnvironmentFile=/etc/default/ollama
+ExecStart=/usr/local/bin/ollama serve
+Restart=always
+RestartSec=3
+LimitNOFILE=1048576
+LimitMEMLOCK=infinity
+LimitNPROC=infinity
+Nice=-5
+IOSchedulingClass=realtime
+IOSchedulingPriority=0
+NoNewPrivileges=false
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/ollama /tmp
+
+[Install]
+WantedBy=multi-user.target

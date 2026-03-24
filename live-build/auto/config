@@ -1,0 +1,32 @@
+#!/bin/bash
+set -e
+
+lb config noauto \
+    --distribution noble \
+    --parent-distribution noble \
+    --parent-archive-areas "main restricted universe multiverse" \
+    --archive-areas "main restricted universe multiverse" \
+    --architectures amd64 \
+    --binary-images iso-hybrid \
+    --mode ubuntu \
+    --system live \
+    --linux-flavours generic \
+    --linux-packages "linux-image linux-headers" \
+    --apt-recommends false \
+    --memtest none \
+    --bootappend-live "boot=live components quiet splash" \
+    --bootappend-install "auto=true priority=critical" \
+    --iso-application "OllamaLinux" \
+    --iso-publisher "OllamaLinux Project" \
+    --iso-volume "OllamaLinux 0.1.0" \
+    --bootloader grub \
+    --cache true \
+    --cache-packages true \
+    --apt-source-archives false \
+    --firmware-binary true \
+    --firmware-chroot true \
+    --volatile true \
+    --security true \
+    --initramfs auto \
+    --initsystem systemd \
+    "${@}"

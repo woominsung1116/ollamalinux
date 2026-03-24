@@ -1,0 +1,6 @@
+pciutils
+lshw
+linux-firmware
+mesa-vulkan-drivers
+vulkan-tools
+clinfo

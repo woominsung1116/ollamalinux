@@ -24,6 +24,12 @@ configure_hostname() {
     hostname=$(whiptail --title "Hostname" \
         --inputbox "Enter a hostname for this machine:" \
         8 60 "ollamalinux" 3>&1 1>&2 2>&3) || return 0
+
+    # Validate RFC-1123 hostname
+    if ! echo "$hostname" | grep -qE '^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$'; then
+        whiptail --msgbox "Invalid hostname. Use only letters, digits, and hyphens (1-63 chars)." 8 60
+        return 1
+    fi
     hostnamectl set-hostname "$hostname"
     log "Hostname set to: $hostname"
 }

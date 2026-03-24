@@ -100,25 +100,22 @@ update_ollama() {
     expected_checksum=$(curl -fsSL --max-time 30 "$checksum_url" 2>/dev/null \
         | grep "ollama-linux-${arch}$" | awk '{print $1}')
 
-    if [ -n "$expected_checksum" ]; then
-        local actual_checksum
-        actual_checksum=$(sha256sum "$tmp_bin" | awk '{print $1}')
-        if [ "$expected_checksum" != "$actual_checksum" ]; then
-            logmsg "ERROR: Checksum verification failed!"
-            logmsg "  Expected: $expected_checksum"
-            logmsg "  Got:      $actual_checksum"
-            rm -rf "$OLLAMA_TMP"
-            return 1
-        fi
-        logmsg "Checksum verified: $actual_checksum"
-    else
-        logmsg "WARN: Could not fetch checksum, falling back to ELF check"
-        if ! file "$tmp_bin" | grep -q "ELF"; then
-            logmsg "ERROR: Downloaded file is not a valid ELF binary"
-            rm -rf "$OLLAMA_TMP"
-            return 1
-        fi
+    if [ -z "$expected_checksum" ]; then
+        logmsg "ERROR: Could not fetch checksum — aborting update for safety"
+        rm -rf "$OLLAMA_TMP"
+        return 1
     fi
+
+    local actual_checksum
+    actual_checksum=$(sha256sum "$tmp_bin" | awk '{print $1}')
+    if [ "$expected_checksum" != "$actual_checksum" ]; then
+        logmsg "ERROR: Checksum verification failed!"
+        logmsg "  Expected: $expected_checksum"
+        logmsg "  Got:      $actual_checksum"
+        rm -rf "$OLLAMA_TMP"
+        return 1
+    fi
+    logmsg "Checksum verified: $actual_checksum"
 
     chmod 755 "$tmp_bin"
 

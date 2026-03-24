@@ -82,6 +82,14 @@ jobs:
           cd live-build
           chmod +x auto/*
 
+          # Fix isolinux paths for live-build 4.x on Ubuntu 24.04
+          sudo mkdir -p /root/isolinux
+          sudo cp /usr/lib/ISOLINUX/isolinux.bin /root/isolinux/ 2>/dev/null || true
+          sudo cp /usr/lib/syslinux/modules/bios/vesamenu.c32 /root/isolinux/ 2>/dev/null || true
+          sudo cp /usr/lib/syslinux/modules/bios/ldlinux.c32 /root/isolinux/ 2>/dev/null || true
+          sudo cp /usr/lib/syslinux/modules/bios/libcom32.c32 /root/isolinux/ 2>/dev/null || true
+          sudo cp /usr/lib/syslinux/modules/bios/libutil.c32 /root/isolinux/ 2>/dev/null || true
+
           sudo lb config
           sudo lb build 2>&1 || true
 

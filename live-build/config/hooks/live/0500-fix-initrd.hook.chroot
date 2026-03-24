@@ -1,0 +1,17 @@
+#!/bin/bash
+set -euo pipefail
+
+echo ">>> Fixing initrd symlinks and regenerating initramfs..."
+
+# Remove dangling symlinks that cause lb_chroot_hacks to fail
+for link in /boot/initrd.img /boot/initrd.img.old /boot/vmlinuz /boot/vmlinuz.old; do
+    if [ -L "$link" ] && [ ! -e "$link" ]; then
+        rm -f "$link"
+        echo "  Removed dangling symlink: $link"
+    fi
+done
+
+# Regenerate initramfs to ensure proper boot files
+update-initramfs -u 2>/dev/null || true
+
+echo ">>> Initrd fix complete."

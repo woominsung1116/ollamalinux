@@ -8,6 +8,9 @@ set -e
 # Architecture can be overridden via ARCH env variable (e.g. ARCH=arm64)
 ARCH="${ARCH:-amd64}"
 
+# Version can be overridden via VERSION env variable
+VERSION="${VERSION:-$(cat ../VERSION 2>/dev/null || echo 0.1.0)}"
+
 # Select mirror based on architecture
 if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
     MIRROR="http://ports.ubuntu.com/ubuntu-ports/"
@@ -37,7 +40,7 @@ lb config noauto \
     --bootappend-live "boot=live components quiet splash" \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
-    --iso-volume "OllamaLinux-0.1.0" \
+    --iso-volume "OllamaLinux-${VERSION}" \
     --bootloader grub2 \
     --security false \
     --volatile false \

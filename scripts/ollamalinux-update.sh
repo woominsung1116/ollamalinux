@@ -95,6 +95,35 @@ update_ollama() {
         return 1
     fi
 
+    # --- Multi-source release verification ---
+    # TODO: Ollama가 GPG 서명 제공 시 gpg --verify 추가
+    # SHA256 체크섬과 바이너리가 동일 출처(GitHub)이므로, 추가 검증 레이어로 보완
+
+    # 1) Verify download URL is from official ollama domain
+    case "$download_url" in
+        https://github.com/ollama/ollama/*)
+            logmsg "Download URL verified: official ollama repository"
+            ;;
+        *)
+            logmsg "ERROR: Download URL is not from official ollama repository: $download_url"
+            rm -rf "$OLLAMA_TMP"
+            return 1
+            ;;
+    esac
+
+    # 2) Verify release author is the official Ollama account
+    local release_author
+    release_author=$(curl -fsSL --max-time 10 \
+        "https://api.github.com/repos/ollama/ollama/releases/tags/${latest}" 2>/dev/null \
+        | grep -o '"login":"[^"]*"' | head -1 | cut -d'"' -f4)
+    if [ -n "$release_author" ] && [ "$release_author" != "ollama" ]; then
+        logmsg "WARN: Release author '$release_author' is not 'ollama' - proceeding with caution"
+    elif [ -z "$release_author" ]; then
+        logmsg "WARN: Could not verify release author (network issue?) - proceeding with caution"
+    else
+        logmsg "Release author verified: $release_author"
+    fi
+
     # Verify SHA256 checksum (security: prevent tampered binaries)
     local checksum_url="https://github.com/ollama/ollama/releases/download/${latest}/sha256sum.txt"
     local expected_checksum

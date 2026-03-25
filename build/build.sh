@@ -48,41 +48,9 @@ if [ -d /build/cache/packages ]; then
     cp /build/cache/packages/*.deb cache/packages.chroot/ 2>/dev/null || true
 fi
 
-# Run live-build
-lb config noauto \
-    --distribution noble \
-    --parent-distribution noble \
-    --parent-archive-areas "main restricted universe multiverse" \
-    --archive-areas "main restricted universe multiverse" \
-    --parent-mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
-    --parent-mirror-binary "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-bootstrap "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-chroot "https://archive.ubuntu.com/ubuntu/" \
-    --mirror-binary "https://archive.ubuntu.com/ubuntu/" \
-    --architectures "${ARCH}" \
-    --binary-images iso \
-    --mode debian \
-    --system live \
-    --linux-flavours generic \
-    --linux-packages "linux-image linux-headers" \
-    --apt-recommends false \
-    --memtest none \
-    --bootappend-live "boot=live components quiet splash" \
-    --iso-application "OllamaLinux" \
-    --iso-publisher "OllamaLinux Project" \
-    --iso-volume "OllamaLinux-${VERSION}" \
-    --bootloader grub2 \
-    --security false \
-    --volatile false \
-    --backports false \
-    --cache true \
-    --cache-packages true \
-    --apt-source-archives false \
-    --firmware-binary false \
-    --firmware-chroot false \
-    --initramfs auto \
-    --initsystem systemd
+# Run live-build config (delegated to auto/config)
+export ARCH VERSION
+lb config
 
 lb build noauto 2>&1 | tee /build/output/build.log
 

@@ -9,10 +9,10 @@ welcomeExpandingLogo: true
 strings:
     productName:         OllamaLinux
     shortProductName:    OllamaLinux
-    version:             1.0
-    shortVersion:        1.0
-    versionedName:       OllamaLinux 1.0
-    shortVersionedName:  OllamaLinux 1.0
+    version:             0.1.0
+    shortVersion:        0.1.0
+    versionedName:       OllamaLinux 0.1.0
+    shortVersionedName:  OllamaLinux 0.1.0
     bootloaderEntryName: OllamaLinux
     productUrl:          https://github.com/woominseong/ollama
     supportUrl:          https://github.com/woominseong/ollama/issues
@@ -20,11 +20,11 @@ strings:
     releaseNotesUrl:     https://github.com/woominseong/ollama
 
 images:
-    productLogo:         "logo.png"
-    productIcon:         "logo.png"
-    productWelcome:      "languages.png"
+    productLogo:         ""
+    productIcon:         ""
+    productWelcome:      ""
 
-slideshow:               "show.qml"
+slideshow:               ""
 
 style:
     sidebarBackground:   "#1a1a2e"

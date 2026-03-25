@@ -83,6 +83,7 @@ jobs:
 
           # Remove desktop packages for server build
           rm -f config/package-lists/desktop.list.chroot
+          rm -f config/package-lists/installer.list.chroot
 
       - name: Build Server ISO
         env:
@@ -230,8 +231,7 @@ jobs:
           retention-days: 30
 
   build-arm64:
-    # Disabled for v0.1.0: QEMU cross-build fails with binfmt issues
-    # TODO: Fix ARM64 cross-compilation or use native ARM64 runner
+    # Disabled: ARM64 requires native runner (Oracle Cloud self-hosted planned for v0.2.0)
     if: false
     runs-on: ubuntu-24.04
     timeout-minutes: 120
@@ -282,6 +282,7 @@ jobs:
 
           # Remove desktop packages for server build
           rm -f config/package-lists/desktop.list.chroot
+          rm -f config/package-lists/installer.list.chroot
 
       - name: Build ARM64 Server ISO
         env:

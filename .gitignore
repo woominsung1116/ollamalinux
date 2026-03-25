@@ -30,4 +30,9 @@ live-build/config/bootstrap
 live-build/config/chroot
 live-build/config/common
 live-build/config/source
+
+# Scripts are copied from scripts/ at build time
+live-build/config/includes.chroot/usr/local/bin/ollamalinux-*
+live-build/config/includes.chroot/usr/local/bin/lib/
+
 .omc/

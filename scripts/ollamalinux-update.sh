@@ -18,7 +18,7 @@ source /usr/local/bin/lib/update.sh 2>/dev/null || \
 
 LOG="/var/log/ollamalinux-update.log"
 OLLAMA_BINARY="/usr/local/bin/ollama"
-OLLAMA_TMP="/tmp/ollama-update-$$"
+OLLAMA_TMP="$(mktemp -d /tmp/ollama-update-XXXXXXXXXX)"
 
 # Options
 OPT_CHECK_ONLY=false
@@ -82,13 +82,14 @@ update_ollama() {
             ;;
     esac
 
-    local download_url="https://github.com/ollama/ollama/releases/download/${latest}/ollama-linux-${arch}"
+    local tgz_name="ollama-linux-${arch}.tgz"
+    local download_url="https://github.com/ollama/ollama/releases/download/${latest}/${tgz_name}"
 
     logmsg "Downloading from $download_url ..."
     mkdir -p "$OLLAMA_TMP"
-    local tmp_bin="$OLLAMA_TMP/ollama"
+    local tmp_tgz="$OLLAMA_TMP/${tgz_name}"
 
-    if ! curl -fsSL --max-time 300 -o "$tmp_bin" "$download_url"; then
+    if ! curl -fsSL --max-time 300 -o "$tmp_tgz" "$download_url"; then
         logmsg "ERROR: Failed to download Ollama binary"
         rm -rf "$OLLAMA_TMP"
         return 1
@@ -98,7 +99,7 @@ update_ollama() {
     local checksum_url="https://github.com/ollama/ollama/releases/download/${latest}/sha256sum.txt"
     local expected_checksum
     expected_checksum=$(curl -fsSL --max-time 30 "$checksum_url" 2>/dev/null \
-        | grep "ollama-linux-${arch}$" | awk '{print $1}')
+        | grep "${tgz_name}$" | awk '{print $1}')
 
     if [ -z "$expected_checksum" ]; then
         logmsg "ERROR: Could not fetch checksum — aborting update for safety"
@@ -107,7 +108,7 @@ update_ollama() {
     fi
 
     local actual_checksum
-    actual_checksum=$(sha256sum "$tmp_bin" | awk '{print $1}')
+    actual_checksum=$(sha256sum "$tmp_tgz" | awk '{print $1}')
     if [ "$expected_checksum" != "$actual_checksum" ]; then
         logmsg "ERROR: Checksum verification failed!"
         logmsg "  Expected: $expected_checksum"
@@ -117,9 +118,7 @@ update_ollama() {
     fi
     logmsg "Checksum verified: $actual_checksum"
 
-    chmod 755 "$tmp_bin"
-
-    # Stop ollama service before replacing binary
+    # Stop ollama service before replacing files
     local ollama_was_running=false
     if systemctl is-active ollama.service &>/dev/null; then
         ollama_was_running=true
@@ -127,8 +126,10 @@ update_ollama() {
         systemctl stop ollama.service
     fi
 
-    # Replace binary
-    install -o root -g root -m 755 "$tmp_bin" "$OLLAMA_BINARY"
+    # Extract tgz (same method as initial install)
+    tar -xzf "$tmp_tgz" -C /usr
+    chmod +x /usr/bin/ollama
+    ln -sf /usr/bin/ollama /usr/local/bin/ollama
     rm -rf "$OLLAMA_TMP"
 
     if [ "$ollama_was_running" = true ]; then
@@ -167,7 +168,7 @@ update_webui() {
         systemctl stop open-webui.service
     fi
 
-    if pip3 install --upgrade open-webui >> "$LOG" 2>&1; then
+    if /opt/open-webui/venv/bin/pip install --upgrade open-webui >> "$LOG" 2>&1; then
         logmsg "Open WebUI upgraded successfully"
     else
         logmsg "ERROR: Open WebUI upgrade failed"

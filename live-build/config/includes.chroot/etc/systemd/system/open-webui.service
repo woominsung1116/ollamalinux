@@ -4,6 +4,7 @@ Documentation=https://github.com/open-webui/open-webui
 After=network-online.target ollama.service
 Wants=ollama.service
 Requires=network-online.target
+ConditionPathExists=/etc/ollamalinux/.firstboot-done
 
 [Service]
 Type=simple

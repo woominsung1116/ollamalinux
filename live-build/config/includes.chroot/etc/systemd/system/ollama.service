@@ -3,6 +3,7 @@ Description=Ollama LLM Server
 Documentation=https://ollama.com
 After=network-online.target
 Wants=network-online.target
+ConditionPathExists=/etc/ollamalinux/.firstboot-done
 
 [Service]
 Type=simple

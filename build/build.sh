@@ -38,8 +38,9 @@ fi
 if [ "$FLAVOR" = "desktop" ]; then
     echo ">>> Including desktop environment packages"
 else
-    echo ">>> Server mode: removing desktop package list"
+    echo ">>> Server mode: removing desktop/installer package lists"
     rm -f config/package-lists/desktop.list.chroot
+    rm -f config/package-lists/installer.list.chroot
 fi
 
 # Use cached APT packages if available

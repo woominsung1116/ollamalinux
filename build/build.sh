@@ -52,12 +52,13 @@ fi
 # Create local syslinux bootloader template (fix broken symlinks in live-build)
 mkdir -p config/bootloaders
 cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
-cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
-cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+# Remove symlinks first (cp can't overwrite dangling symlinks)
+find config/bootloaders/isolinux/ -type l -delete
+cp /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/
+cp /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/
+cp /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/
+cp /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/
+cp /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/
 rm -f config/bootloaders/isolinux/splash.svg.in
 if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
     (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo

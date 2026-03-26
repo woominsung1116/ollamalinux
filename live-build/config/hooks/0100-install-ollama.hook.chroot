@@ -5,27 +5,27 @@ echo ">>> Installing Ollama..."
 
 # Download Ollama binary directly (avoid curl|sh for security)
 # Auto-detect latest version from GitHub API, fallback to pinned version
-OLLAMA_VERSION="${OLLAMA_VERSION:-$(curl -fsSL https://api.github.com/repos/ollama/ollama/releases/latest 2>/dev/null | grep -o '"tag_name":"[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//' || echo "0.6.2")}"
+OLLAMA_VERSION="${OLLAMA_VERSION:-$(curl -fsSL https://api.github.com/repos/ollama/ollama/releases/latest 2>/dev/null | grep -o '"tag_name":"[^"]*"' | head -1 | cut -d'"' -f4 | sed 's/^v//' || echo "0.18.3")}"
 echo "  Ollama version: ${OLLAMA_VERSION}"
 DEB_ARCH="$(dpkg --print-architecture)"
-OLLAMA_TGZ="ollama-linux-${DEB_ARCH}.tgz"
-OLLAMA_URL="https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/${OLLAMA_TGZ}"
+OLLAMA_ARCHIVE="ollama-linux-${DEB_ARCH}.tar.zst"
+OLLAMA_URL="https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/${OLLAMA_ARCHIVE}"
 
 echo "  Downloading from: ${OLLAMA_URL}"
-curl -fsSL "${OLLAMA_URL}" -o "/tmp/${OLLAMA_TGZ}"
+curl -fsSL "${OLLAMA_URL}" -o "/tmp/${OLLAMA_ARCHIVE}"
 
 # Verify SHA256 checksum (security: prevent tampered binaries)
 echo "  Verifying SHA256 checksum..."
 CHECKSUM_URL="https://github.com/ollama/ollama/releases/download/v${OLLAMA_VERSION}/sha256sum.txt"
 curl -fsSL "${CHECKSUM_URL}" -o /tmp/sha256sum.txt
-cd /tmp && grep "${OLLAMA_TGZ}" sha256sum.txt | sha256sum -c - || {
-    echo ">>> ERROR: SHA256 checksum verification failed for ${OLLAMA_TGZ}"
+cd /tmp && grep "${OLLAMA_ARCHIVE}" sha256sum.txt | sha256sum -c - || {
+    echo ">>> ERROR: SHA256 checksum verification failed for ${OLLAMA_ARCHIVE}"
     exit 1
 }
 cd - > /dev/null
 
-tar -xzf "/tmp/${OLLAMA_TGZ}" -C /usr
-rm -f "/tmp/${OLLAMA_TGZ}" /tmp/sha256sum.txt
+tar --use-compress-program=unzstd -xf "/tmp/${OLLAMA_ARCHIVE}" -C /usr
+rm -f "/tmp/${OLLAMA_ARCHIVE}" /tmp/sha256sum.txt
 chmod +x /usr/bin/ollama
 
 # Ensure ollama is available at /usr/local/bin (service ExecStart path)

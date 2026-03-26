@@ -1,6 +1,7 @@
 #!/bin/bash
 # OllamaLinux First-Boot Configuration Wizard
-set -euo pipefail
+set -uo pipefail
+trap 'systemctl start getty@tty1.service 2>/dev/null || true' EXIT
 
 source /usr/local/bin/lib/ui.sh 2>/dev/null || true
 source /usr/local/bin/lib/common.sh 2>/dev/null || true
@@ -130,7 +131,6 @@ configure_webui() {
 configure_access() {
     # Force 127.0.0.1 for security
     sed -i 's/OLLAMA_HOST=.*/OLLAMA_HOST=127.0.0.1:11434/' /etc/default/ollama
-    systemctl restart ollama.service
     log "Ollama bound to 127.0.0.1:11434 (Local only)"
 }
 
@@ -167,13 +167,29 @@ main() {
     configure_hostname
     create_user
     detect_gpu
+
+    # Start temporary ollama server for model downloads
+    sudo -u ollama /usr/local/bin/ollama serve &>/dev/null &
+    local ollama_pid=$!
+    sleep 2
+
     select_models
+
+    # Stop temporary server
+    kill "$ollama_pid" 2>/dev/null || true
+    wait "$ollama_pid" 2>/dev/null || true
+
     configure_webui
     configure_access
-    show_summary
 
     touch "$FIRSTBOOT_FLAG"
     log "=== First-boot wizard completed ==="
+
+    # Start services properly via systemd now that firstboot flag exists
+    systemctl daemon-reload 2>/dev/null || true
+    systemctl start ollama.service 2>/dev/null || true
+
+    show_summary
 }
 
 main "$@"

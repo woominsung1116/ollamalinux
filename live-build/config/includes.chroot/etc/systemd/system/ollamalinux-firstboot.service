@@ -2,17 +2,18 @@
 Description=OllamaLinux First-Boot Configuration Wizard
 After=multi-user.target systemd-logind.service
 ConditionPathExists=!/etc/ollamalinux/.firstboot-done
+Conflicts=getty@tty1.service
+After=getty@tty1.service
 
 [Service]
 Type=oneshot
+ExecStartPre=/usr/bin/systemctl stop getty@tty1.service
 ExecStart=/usr/local/bin/ollamalinux-firstboot
-ProtectKernelTunables=true
-ProtectKernelModules=true
-ProtectControlGroups=true
-RestrictSUIDSGID=true
+ExecStopPost=/usr/bin/systemctl start getty@tty1.service
 NoNewPrivileges=true
 StandardInput=tty
 StandardOutput=tty
+StandardError=tty
 TTYPath=/dev/tty1
 TTYReset=yes
 TTYVHangup=yes

@@ -8,4 +8,8 @@ systemctl enable open-webui.service
 systemctl enable ollamalinux-firstboot.service
 systemctl enable ssh.service
 
+echo ">>> Ensuring network directories exist..."
+mkdir -p /etc/network
+touch /etc/network/interfaces
+
 echo ">>> Services configured."

@@ -135,7 +135,7 @@ jobs:
           mkdir -p output
           VERSION=$(cat VERSION)
           sudo mv live-build/*.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || \
-            sudo mv live-build/binary.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || true
+            sudo mv live-build/binary.hybrid.iso output/ollamalinux-${VERSION}-server-amd64.iso 2>/dev/null || true
           sudo chown -R runner:runner output/
           cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
           ls -lh .
@@ -246,7 +246,7 @@ jobs:
           mkdir -p output
           VERSION=$(cat VERSION)
           sudo mv live-build/*.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || \
-            sudo mv live-build/binary.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || true
+            sudo mv live-build/binary.hybrid.iso output/ollamalinux-${VERSION}-desktop-amd64.iso 2>/dev/null || true
           sudo chown -R runner:runner output/
           cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
           ls -lh .
@@ -333,7 +333,7 @@ jobs:
           sudo lb build 2>&1 | tee build.log
 
           # Verify ISO was produced
-          ls -lh *.iso binary.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
+          ls -lh *.iso binary.hybrid.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
 
       - name: Upload build log on failure
         if: failure()
@@ -348,7 +348,7 @@ jobs:
           mkdir -p output
           VERSION=$(cat VERSION)
           sudo mv live-build/*.iso output/ollamalinux-${VERSION}-server-arm64.iso 2>/dev/null || \
-            sudo mv live-build/binary.iso output/ollamalinux-${VERSION}-server-arm64.iso 2>/dev/null || true
+            sudo mv live-build/binary.hybrid.iso output/ollamalinux-${VERSION}-server-arm64.iso 2>/dev/null || true
           sudo chown -R runner:runner output/
           cd output && sha256sum *.iso > SHA256SUMS 2>/dev/null || true
           ls -lh .

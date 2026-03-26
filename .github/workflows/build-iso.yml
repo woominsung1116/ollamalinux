@@ -96,13 +96,15 @@ jobs:
           mkdir -p config/bootloaders
           cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
           # Replace symlinks with real binary files
-          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/
           # Remove broken symlinks and obsolete files
           find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+          # Verify isolinux.bin exists
+          ls -la config/bootloaders/isolinux/isolinux.bin || { echo "ERROR: isolinux.bin not found!"; exit 1; }
           rm -f config/bootloaders/isolinux/splash.svg.in
           # Create empty bootlogo cpio if missing
           if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
@@ -209,12 +211,13 @@ jobs:
           # Create local syslinux bootloader template (same as server build)
           mkdir -p config/bootloaders
           cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
-          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
-          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/
+          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/
           find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+          ls -la config/bootloaders/isolinux/isolinux.bin || { echo "ERROR: isolinux.bin not found!"; exit 1; }
           rm -f config/bootloaders/isolinux/splash.svg.in
           if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
             (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo

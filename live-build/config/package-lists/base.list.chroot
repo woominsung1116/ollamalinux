@@ -44,3 +44,5 @@ dialog
 zstd
 pigz
 syslinux-utils
+isolinux
+syslinux-common

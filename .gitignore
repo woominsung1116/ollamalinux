@@ -36,3 +36,4 @@ live-build/config/includes.chroot/usr/local/bin/ollamalinux-*
 live-build/config/includes.chroot/usr/local/bin/lib/
 
 .omc/
+..bfg-report/

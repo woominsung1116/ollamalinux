@@ -30,7 +30,7 @@ lb config noauto \
     --mirror-chroot "${MIRROR}" \
     --mirror-binary "${MIRROR}" \
     --architectures "${ARCH}" \
-    --binary-images iso \
+    --binary-images iso-hybrid \
     --mode debian \
     --system live \
     --linux-flavours generic \
@@ -41,7 +41,7 @@ lb config noauto \
     --iso-application "OllamaLinux" \
     --iso-publisher "OllamaLinux Project" \
     --iso-volume "OllamaLinux-${VERSION}" \
-    --bootloader grub2 \
+    --bootloader syslinux \
     --security false \
     --volatile false \
     --backports false \

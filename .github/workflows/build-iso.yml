@@ -92,8 +92,24 @@ jobs:
           cd live-build
           chmod +x auto/*
 
-          # Patch genisoimage 4GB limit: only patch the actual command invocation line
-          # (squashfs exceeds 4GB due to Ollama+CUDA packages)
+          # Create local syslinux bootloader template with real files (not broken symlinks)
+          mkdir -p config/bootloaders
+          cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
+          # Replace symlinks with real binary files
+          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          # Remove broken symlinks and obsolete files
+          find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+          rm -f config/bootloaders/isolinux/splash.svg.in
+          # Create empty bootlogo cpio if missing
+          if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
+            (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo
+          fi
+
+          # Patch genisoimage 4GB limit (squashfs exceeds 4GB)
           LB_ISO="/usr/lib/live/build/lb_binary_iso"
           if [ -f "$LB_ISO" ]; then
             sudo sed -i '/^\s*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
@@ -104,7 +120,7 @@ jobs:
           sudo lb build 2>&1 | tee build.log
 
           # Verify ISO was produced
-          ls -lh *.iso binary.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
+          ls -lh *.iso binary.hybrid.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
 
       - name: Upload build log on failure
         if: failure()
@@ -190,7 +206,21 @@ jobs:
           cd live-build
           chmod +x auto/*
 
-          # Patch genisoimage 4GB limit (same as server build)
+          # Create local syslinux bootloader template (same as server build)
+          mkdir -p config/bootloaders
+          cp -a /usr/share/live/build/bootloaders/isolinux config/bootloaders/
+          cp -fL /usr/lib/ISOLINUX/isolinux.bin config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/vesamenu.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/ldlinux.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/libcom32.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          cp -fL /usr/lib/syslinux/modules/bios/libutil.c32 config/bootloaders/isolinux/ 2>/dev/null || true
+          find config/bootloaders/isolinux/ -xtype l -delete 2>/dev/null || true
+          rm -f config/bootloaders/isolinux/splash.svg.in
+          if [ ! -e config/bootloaders/isolinux/bootlogo ]; then
+            (cd /tmp && ls -d . | cpio --quiet -o) > config/bootloaders/isolinux/bootlogo
+          fi
+
+          # Patch genisoimage 4GB limit
           LB_ISO="/usr/lib/live/build/lb_binary_iso"
           if [ -f "$LB_ISO" ]; then
             sudo sed -i '/^\s*genisoimage\s/s/genisoimage/genisoimage -allow-limited-size/' "$LB_ISO"
@@ -201,7 +231,7 @@ jobs:
           sudo lb build 2>&1 | tee build.log
 
           # Verify ISO was produced
-          ls -lh *.iso binary.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
+          ls -lh *.iso binary.hybrid.iso 2>/dev/null || { echo "ERROR: No ISO produced"; exit 1; }
 
       - name: Upload build log on failure
         if: failure()

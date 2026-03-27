@@ -1,7 +1,7 @@
 #!/bin/bash
 # OllamaLinux First-Boot Configuration Wizard
 set -uo pipefail
-trap 'systemctl start getty@tty1.service 2>/dev/null || true' EXIT
+# getty restore handled by systemd ExecStopPost
 
 source /usr/local/bin/lib/ui.sh 2>/dev/null || true
 source /usr/local/bin/lib/common.sh 2>/dev/null || true
@@ -145,6 +145,7 @@ show_summary() {
     models=$(sudo -u ollama ollama list 2>/dev/null | tail -n +2 | awk '{print "  - " $1}') || models="  (none)"
 
     whiptail --title "Setup Complete!" \
+        --scrolltext \
         --msgbox "OllamaLinux is ready!\n\n\
 GPU: ${gpu_type:-cpu}\n\
 Ollama API: http://127.0.0.1:11434 (Local only)\n\
@@ -190,6 +191,9 @@ main() {
     systemctl start ollama.service 2>/dev/null || true
 
     show_summary
+
+    log "Wizard finished, restoring login prompt"
 }
 
 main "$@"
+# getty@tty1 is restored by ExecStopPost in the systemd unit

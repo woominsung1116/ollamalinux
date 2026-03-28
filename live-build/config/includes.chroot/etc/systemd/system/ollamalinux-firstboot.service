@@ -2,6 +2,7 @@
 Description=OllamaLinux First-Boot Configuration Wizard
 After=multi-user.target systemd-logind.service getty@tty1.service
 ConditionPathExists=!/etc/ollamalinux/.firstboot-done
+Conflicts=getty@tty1.service
 
 [Service]
 Type=oneshot

@@ -1,6 +1,7 @@
 [Unit]
 Description=OllamaLinux First-Boot Configuration Wizard
-After=multi-user.target systemd-logind.service getty@tty1.service
+After=multi-user.target systemd-logind.service getty@tty1.service network-online.target
+Wants=network-online.target
 ConditionPathExists=!/etc/ollamalinux/.firstboot-done
 Conflicts=getty@tty1.service
 OnSuccess=getty@tty1.service

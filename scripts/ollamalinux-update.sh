@@ -82,14 +82,14 @@ update_ollama() {
             ;;
     esac
 
-    local tgz_name="ollama-linux-${arch}.tgz"
-    local download_url="https://github.com/ollama/ollama/releases/download/${latest}/${tgz_name}"
+    local archive_name="ollama-linux-${arch}.tar.zst"
+    local download_url="https://github.com/ollama/ollama/releases/download/${latest}/${archive_name}"
 
     logmsg "Downloading from $download_url ..."
     mkdir -p "$OLLAMA_TMP"
-    local tmp_tgz="$OLLAMA_TMP/${tgz_name}"
+    local tmp_archive="$OLLAMA_TMP/${archive_name}"
 
-    if ! curl -fsSL --max-time 300 -o "$tmp_tgz" "$download_url"; then
+    if ! curl -fsSL --max-time 300 -o "$tmp_archive" "$download_url"; then
         logmsg "ERROR: Failed to download Ollama binary"
         rm -rf "$OLLAMA_TMP"
         return 1
@@ -128,7 +128,7 @@ update_ollama() {
     local checksum_url="https://github.com/ollama/ollama/releases/download/${latest}/sha256sum.txt"
     local expected_checksum
     expected_checksum=$(curl -fsSL --max-time 30 "$checksum_url" 2>/dev/null \
-        | grep "${tgz_name}$" | awk '{print $1}')
+        | grep "${archive_name}$" | awk '{print $1}')
 
     if [ -z "$expected_checksum" ]; then
         logmsg "ERROR: Could not fetch checksum — aborting update for safety"
@@ -137,7 +137,7 @@ update_ollama() {
     fi
 
     local actual_checksum
-    actual_checksum=$(sha256sum "$tmp_tgz" | awk '{print $1}')
+    actual_checksum=$(sha256sum "$tmp_archive" | awk '{print $1}')
     if [ "$expected_checksum" != "$actual_checksum" ]; then
         logmsg "ERROR: Checksum verification failed!"
         logmsg "  Expected: $expected_checksum"
@@ -155,8 +155,8 @@ update_ollama() {
         systemctl stop ollama.service
     fi
 
-    # Extract tgz (same method as initial install)
-    tar -xzf "$tmp_tgz" -C /usr
+    # Extract tar.zst (same method as initial install)
+    tar --zstd -xf "$tmp_archive" -C /usr
     chmod +x /usr/bin/ollama
     ln -sf /usr/bin/ollama /usr/local/bin/ollama
     rm -rf "$OLLAMA_TMP"

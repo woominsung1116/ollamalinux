@@ -172,7 +172,16 @@ main() {
     # Start temporary ollama server for model downloads
     sudo -u ollama /usr/local/bin/ollama serve &>/dev/null &
     local ollama_pid=$!
-    sleep 2
+    # Wait for ollama to be ready (up to 30s)
+    local wait_count=0
+    while ! curl -sf http://127.0.0.1:11434/ &>/dev/null; do
+        wait_count=$((wait_count + 1))
+        if [ $wait_count -ge 30 ]; then
+            log "WARN: Ollama server did not start within 30s"
+            break
+        fi
+        sleep 1
+    done
 
     select_models
 

@@ -1,7 +1,7 @@
 #!/bin/bash
 # OllamaLinux First-Boot Configuration Wizard
 set -uo pipefail
-# getty restore handled by systemd ExecStopPost
+# getty restore handled by systemd OnSuccess/OnFailure
 
 source /usr/local/bin/lib/ui.sh 2>/dev/null || true
 source /usr/local/bin/lib/common.sh 2>/dev/null || true
@@ -183,11 +183,28 @@ main() {
     configure_webui
     configure_access
 
+    # Update getty@tty1 autologin to use the new user (live-config defaults to "user")
+    local getty_override="/etc/systemd/system/getty@tty1.service.d"
+    mkdir -p "$getty_override"
+    cat > "$getty_override/override.conf" <<EOF
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty --autologin $username --noclear %I \$TERM
+EOF
+    log "getty@tty1 autologin updated to: $username"
+
+    # Lock the default live-config "user" account if a different user was created
+    if [ "$username" != "user" ] && id "user" &>/dev/null; then
+        passwd -l "user" 2>/dev/null || true
+        log "Default 'user' account locked"
+    fi
+
+    systemctl daemon-reload 2>/dev/null || true
+
     touch "$FIRSTBOOT_FLAG"
     log "=== First-boot wizard completed ==="
 
     # Start services properly via systemd now that firstboot flag exists
-    systemctl daemon-reload 2>/dev/null || true
     systemctl start ollama.service 2>/dev/null || true
 
     show_summary
@@ -196,4 +213,4 @@ main() {
 }
 
 main "$@"
-# getty@tty1 is restored by ExecStopPost in the systemd unit
+# getty@tty1 is restored by OnSuccess/OnFailure in the systemd unit
